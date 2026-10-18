@@ -88,9 +88,7 @@
     <string name="notif_channel_running">计时进行中</string>
     <string name="notif_channel_running_desc">沙漏运行或暂停时显示剩余时间</string>
     <string name="notif_times_up">时间到</string>
-    <string name="notif_channel_finished_desc">沙漏漏完时响铃提示</string>
-    <string name="notif_channel_quiet">时间到（静音）</string>
-    <string name="notif_channel_quiet_desc">关闭响铃时，沙漏漏完的静音提示</string>
+    <string name="notif_channel_done_desc">沙漏漏完时提示，响铃由应用自己播放</string>
     <string name="notif_link_title">已连接到你的 Mac</string>
     <string name="notif_link_desc">让沙漏计时器在后台与 Mac 保持连接</string>
     <string name="notif_title_running">沙漏运行中</string>

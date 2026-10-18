@@ -91,9 +91,7 @@
     <string name="notif_channel_running">Timer running</string>
     <string name="notif_channel_running_desc">The time left, while the sand runs or is paused</string>
     <string name="notif_times_up">Time\'s up</string>
-    <string name="notif_channel_finished_desc">A chime when the sand runs out</string>
-    <string name="notif_channel_quiet">Time\'s up, quietly</string>
-    <string name="notif_channel_quiet_desc">When the sand runs out with the chime turned off</string>
+    <string name="notif_channel_done_desc">A word when the sand runs out; the chime is rung by the app itself</string>
     <string name="notif_link_title">Linked to your Mac</string>
     <string name="notif_link_desc">Keeps Sand Timer connected to your Mac in the background</string>
     <string name="notif_title_running">Sand running</string>

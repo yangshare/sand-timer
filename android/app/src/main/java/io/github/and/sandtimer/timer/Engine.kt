@@ -146,8 +146,10 @@ object Engine {
 /** The sand ran out. */
 class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
+        val pending = goAsync()
         Store.init(context)
         Engine.settle(context)
+        Chime.thenFinish(pending)
     }
 }
 

@@ -7,8 +7,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.media.AudioAttributes
-import android.net.Uri
 import io.github.and.sandtimer.R
 import io.github.and.sandtimer.data.ProjectList
 import io.github.and.sandtimer.data.Store
@@ -16,13 +14,15 @@ import io.github.and.sandtimer.data.TimerState
 import io.github.and.sandtimer.ui.MainActivity
 
 /**
- * The notification that stands in for the timer while you're elsewhere — counting down, with Pause and End — and
- * the one that chimes when the sand runs out.
+ * The notification that stands in for the timer while you're elsewhere — counting down, with Pause and End — and the
+ * one that says the sand has run out. The chime is rung by [Chime] rather than the notification: some phones play no
+ * notification sound at all, and a channel's sound, once made, can never be changed.
  */
 object Notifications {
     private const val RUNNING = "running"
-    private const val FINISHED = "finished"
-    private const val FINISHED_QUIET = "finished-quiet"
+    private const val DONE = "done"
+    private const val LEGACY_FINISHED = "finished"
+    private const val LEGACY_FINISHED_QUIET = "finished-quiet"
     private const val ONGOING_ID = 1
     private const val FINISHED_ID = 2
 
@@ -32,18 +32,14 @@ object Notifications {
             description = context.getString(R.string.notif_channel_running_desc)
             setShowBadge(false)
         })
-        manager.createNotificationChannel(NotificationChannel(FINISHED, context.getString(R.string.notif_times_up), NotificationManager.IMPORTANCE_HIGH).apply {
-            description = context.getString(R.string.notif_channel_finished_desc)
-            setSound(
-                Uri.parse("android.resource://${context.packageName}/${R.raw.chime}"),
-                AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build(),
-            )
-        })
-        manager.createNotificationChannel(NotificationChannel(FINISHED_QUIET, context.getString(R.string.notif_channel_quiet), NotificationManager.IMPORTANCE_DEFAULT).apply {
-            description = context.getString(R.string.notif_channel_quiet_desc)
+        manager.createNotificationChannel(NotificationChannel(DONE, context.getString(R.string.notif_times_up), NotificationManager.IMPORTANCE_HIGH).apply {
+            description = context.getString(R.string.notif_channel_done_desc)
             setSound(null, null)
+            setShowBadge(false)
         })
+        // The channels of earlier builds, whose chime lived in the notification where phones could silence it.
+        manager.deleteNotificationChannel(LEGACY_FINISHED)
+        manager.deleteNotificationChannel(LEGACY_FINISHED_QUIET)
     }
 
     private fun openApp(context: Context) = PendingIntent.getActivity(
@@ -96,14 +92,15 @@ object Notifications {
         manager.notify(ONGOING_ID, builder.build())
     }
 
-    /** The sand ran out: a chime, unless it's switched off, and a word to say so. */
+    /** The sand ran out: the chime, rung by the app itself unless it's switched off, and a word to say so. */
     fun finished(context: Context, state: TimerState) {
         val s = Store.state.value
         val manager = context.getSystemService(NotificationManager::class.java)
         manager.cancel(ONGOING_ID)
+        if (s.settings.chime) Chime.play(context)
         val project = s.projects.project(state.project)?.name
         val span = context.resources.getQuantityString(R.plurals.notif_minutes, state.minutes, state.minutes)
-        manager.notify(FINISHED_ID, Notification.Builder(context, if (s.settings.chime) FINISHED else FINISHED_QUIET)
+        manager.notify(FINISHED_ID, Notification.Builder(context, DONE)
             .setSmallIcon(R.drawable.ic_notification)
             .setColor(color(s.projects, state.project))
             .setContentTitle(context.getString(R.string.notif_times_up))
