@@ -40,6 +40,10 @@ android {
     testOptions {
         unitTests.isReturnDefaultValues = true
     }
+    lint {
+        // The app uses ComponentActivity only; the Fragment/ActivityResult check misfires on release builds.
+        disable += "InvalidFragmentVersionForActivityResult"
+    }
 }
 
 dependencies {
