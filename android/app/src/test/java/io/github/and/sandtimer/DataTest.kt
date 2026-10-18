@@ -121,7 +121,7 @@ class DataTest {
         val days = log.buckets(SandLog.Period.DAILY, LocalDateTime.of(2026, 10, 7, 12, 0))
         assertEquals(14, days.size)
         assertEquals(60.0, days.last().total.seconds, 0.001)
-        assertEquals("Yesterday", days[12].title)
+        assertEquals(SandLog.Bucket.Title.YESTERDAY, days[12].title)
         assertEquals(30.0, days[12].projects.getValue("").seconds, 0.001)
     }
 }

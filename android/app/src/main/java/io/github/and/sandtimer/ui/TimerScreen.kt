@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.boundsInWindow
@@ -54,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.background
 import androidx.compose.runtime.withFrameMillis
+import io.github.and.sandtimer.R
 import io.github.and.sandtimer.data.ProjectList
 import io.github.and.sandtimer.data.SandLog
 import io.github.and.sandtimer.data.Store
@@ -133,7 +135,7 @@ fun TimerScreen(modifier: Modifier = Modifier) {
         Column(Modifier.alpha(controls), horizontalAlignment = Alignment.CenterHorizontally) {
             ProjectChips(app.projects, app.activeProject, enabled = canSwitch) { Store.setActiveProject(it) }
             if (!canSwitch) {
-                Text("End the session to switch projects.", color = Color.White.copy(alpha = 0.45f), fontSize = 12.sp)
+                Text(stringResource(R.string.timer_switch_locked), color = Color.White.copy(alpha = 0.45f), fontSize = 12.sp)
             }
         }
 
@@ -168,9 +170,9 @@ fun TimerScreen(modifier: Modifier = Modifier) {
         Column(Modifier.alpha(controls), horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             when {
-                running -> sessionProject?.name ?: "Running"
-                paused -> "Paused · ${Notifications.clock(left)} left"
-                else -> "Tap the glass to start"
+                running -> sessionProject?.name ?: stringResource(R.string.timer_status_running)
+                paused -> stringResource(R.string.status_paused_left, Notifications.clock(left))
+                else -> stringResource(R.string.timer_status_idle)
             },
             color = Color.White.copy(alpha = 0.6f), fontSize = 14.sp,
         )
@@ -178,15 +180,15 @@ fun TimerScreen(modifier: Modifier = Modifier) {
 
         if (state.inSession(now)) {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Button(onClick = { Engine.tap(context) }) { Text(if (running) "Pause" else "Resume") }
-                OutlinedButton(onClick = { Engine.end(context) }) { Text("End Session") }
+                Button(onClick = { Engine.tap(context) }) { Text(if (running) stringResource(R.string.timer_pause) else stringResource(R.string.timer_resume)) }
+                OutlinedButton(onClick = { Engine.end(context) }) { Text(stringResource(R.string.timer_end_session)) }
             }
         } else {
             Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 for (m in lengths) {
                     FilterChip(
                         selected = state.minutes == m, onClick = { Engine.setMinutes(context, m) },
-                        label = { Text(if (m == 25) "25 🍅" else "$m") },
+                        label = { Text(if (m == 25) stringResource(R.string.chip_pomodoro) else m.toString()) },
                     )
                 }
             }
@@ -209,7 +211,7 @@ private fun ProjectChips(projects: ProjectList, active: String?, enabled: Boolea
                 leadingIcon = {
                     Box(Modifier.size(10.dp).clip(CircleShape).background(if (p == null) Color.Gray else sandColor(p.color)))
                 },
-                label = { Text(p?.name ?: ProjectList.UNTITLED) },
+                label = { Text(projects.displayName(id)) },
                 colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Panel),
             )
         }
@@ -219,6 +221,7 @@ private fun ProjectChips(projects: ProjectList, active: String?, enabled: Boolea
 /** Today's time, here and on a linked Mac, against the target if there is one. */
 @Composable
 private fun Today(log: SandLog, counting: Double, targetMinutes: Int) {
+    val res = LocalContext.current.resources
     val day = log.on(LocalDate.now())
     val today = day.copy(seconds = day.seconds + counting)
     Spacer(Modifier.height(16.dp))
@@ -232,12 +235,12 @@ private fun Today(log: SandLog, counting: Double, targetMinutes: Int) {
         )
         Spacer(Modifier.height(6.dp))
         Text(
-            "${SandLog.durationLabel(today.seconds)} of ${SandLog.durationLabel(targetMinutes * 60.0)} today",
+            stringResource(R.string.timer_today_target, durationLabel(res, today.seconds), durationLabel(res, targetMinutes * 60.0)),
             color = Color.White.copy(alpha = 0.6f), fontSize = 13.sp, textAlign = TextAlign.Center,
         )
     } else {
         Text(
-            "${SandLog.durationLabel(today.seconds)} today · ${SandLog.timersLabel(today.finished)} finished",
+            stringResource(R.string.timer_today, durationLabel(res, today.seconds), timersLabel(res, today.finished)),
             color = Color.White.copy(alpha = 0.6f), fontSize = 13.sp,
         )
     }

@@ -138,16 +138,21 @@ data class SandLog(val days: Map<String, Day> = emptyMap()) {
     fun byMonth(): Map<String, JsonObject> =
         days.entries.groupBy { it.key.take(7) }.mapValues { (_, entries) -> JsonObject(entries.associate { it.key to dayJson(it.value) }) }
 
-    enum class Period(val title: String, val span: Int, val current: String) {
-        HOURLY("Hourly", 24, "This hour"),
-        DAILY("Daily", 14, "Today"),
-        WEEKLY("Weekly", 12, "This week"),
-        MONTHLY("Monthly", 12, "This month"),
-        YEARLY("Yearly", 5, "This year"),
+    enum class Period(val span: Int) {
+        HOURLY(24), DAILY(14), WEEKLY(12), MONTHLY(12), YEARLY(5),
     }
 
-    /** One bar of the chart: a span, with what the timer did in it. */
-    data class Bucket(val label: String, val title: String, val start: LocalDateTime, val total: Tally, val projects: Map<String, Tally>)
+    /** One bar of the chart: a span, with what the timer did in it. [title] says which bar it is; the interface says it in words. */
+    data class Bucket(
+        val label: String,
+        val title: Title,
+        val start: LocalDateTime,
+        val total: Tally,
+        val projects: Map<String, Tally>,
+    ) {
+        /** What this bar is: a named span, or a date the interface formats ([DATED]). */
+        enum class Title { THIS_HOUR, LAST_HOUR, TODAY, YESTERDAY, THIS_WEEK, THIS_MONTH, THIS_YEAR, DATED }
+    }
 
     /** The last `period.span` spans, oldest first, the one happening now last. */
     fun buckets(period: Period, now: LocalDateTime, locale: Locale = Locale.getDefault()): List<Bucket> {
@@ -196,14 +201,16 @@ data class SandLog(val days: Map<String, Day> = emptyMap()) {
                 Period.YEARLY -> start.year.toString()
             }
             val title = when {
-                last -> period.current
-                period == Period.DAILY && index == starts.lastIndex - 1 -> "Yesterday"
-                period == Period.HOURLY && index == starts.lastIndex - 1 -> "Last hour"
-                period == Period.HOURLY -> start.format(DateTimeFormatter.ofPattern("EEEE H:00", locale))
-                period == Period.DAILY -> start.format(DateTimeFormatter.ofPattern("EEEE d MMM", locale))
-                period == Period.WEEKLY -> "Week of " + start.format(DateTimeFormatter.ofPattern("d MMM", locale))
-                period == Period.MONTHLY -> start.format(DateTimeFormatter.ofPattern("MMMM yyyy", locale))
-                else -> start.year.toString()
+                last -> when (period) {
+                    Period.HOURLY -> Bucket.Title.THIS_HOUR
+                    Period.DAILY -> Bucket.Title.TODAY
+                    Period.WEEKLY -> Bucket.Title.THIS_WEEK
+                    Period.MONTHLY -> Bucket.Title.THIS_MONTH
+                    Period.YEARLY -> Bucket.Title.THIS_YEAR
+                }
+                period == Period.DAILY && index == starts.lastIndex - 1 -> Bucket.Title.YESTERDAY
+                period == Period.HOURLY && index == starts.lastIndex - 1 -> Bucket.Title.LAST_HOUR
+                else -> Bucket.Title.DATED
             }
             Bucket(label, title, start, totals[index], parts[index])
         }
@@ -246,16 +253,6 @@ data class SandLog(val days: Map<String, Day> = emptyMap()) {
             }))
         }
 
-        /** "3h 20m", "45m", "12s". */
-        fun durationLabel(seconds: Double): String {
-            val total = Math.round(seconds).toInt()
-            if (total < 60) return "${total}s"
-            val minutes = total / 60
-            if (minutes < 60) return "${minutes}m"
-            return if (minutes % 60 == 0) "${minutes / 60}h" else "${minutes / 60}h ${minutes % 60}m"
-        }
-
-        fun timersLabel(count: Int) = "$count timer" + if (count == 1) "" else "s"
     }
 }
 

@@ -39,9 +39,12 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.and.sandtimer.R
 import io.github.and.sandtimer.data.ProjectList
 import io.github.and.sandtimer.data.SandLog
 import io.github.and.sandtimer.data.Store
@@ -52,6 +55,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun StatsScreen(modifier: Modifier = Modifier) {
     val app by Store.state.collectAsState()
+    val res = LocalContext.current.resources
     var periodIndex by rememberSaveable { mutableIntStateOf(1) }
     val period = SandLog.Period.entries[periodIndex]
     val log = app.wholeLog
@@ -65,14 +69,14 @@ fun StatsScreen(modifier: Modifier = Modifier) {
                 SegmentedButton(
                     selected = index == periodIndex, onClick = { periodIndex = index },
                     shape = SegmentedButtonDefaults.itemShape(index, SandLog.Period.entries.size),
-                    label = { Text(p.title.take(if (p == SandLog.Period.MONTHLY) 5 else 6), fontSize = 12.sp, maxLines = 1) },
+                    label = { Text(stringResource(periodName(p)), fontSize = 12.sp, maxLines = 1) },
                 )
             }
         }
         Spacer(Modifier.height(20.dp))
-        Text(bucket.title, color = Color.White.copy(alpha = 0.6f), fontSize = 14.sp)
-        Text(SandLog.durationLabel(bucket.total.seconds), color = Color.White, fontSize = 36.sp, fontWeight = FontWeight.Medium)
-        Text("${SandLog.timersLabel(bucket.total.finished)} finished", color = Color.White.copy(alpha = 0.6f), fontSize = 13.sp)
+        Text(bucketTitle(bucket, period), color = Color.White.copy(alpha = 0.6f), fontSize = 14.sp)
+        Text(durationLabel(res, bucket.total.seconds), color = Color.White, fontSize = 36.sp, fontWeight = FontWeight.Medium)
+        Text(stringResource(R.string.stats_finished, timersLabel(res, bucket.total.finished)), color = Color.White.copy(alpha = 0.6f), fontSize = 13.sp)
         Breakdown(bucket.projects, app.projects)
         Spacer(Modifier.height(16.dp))
         Chart(buckets, app.projects, selected) { selected = it }
@@ -81,21 +85,53 @@ fun StatsScreen(modifier: Modifier = Modifier) {
         Spacer(Modifier.height(16.dp))
 
         val all = log.allTime
-        val since = log.firstDay()?.format(DateTimeFormatter.ofPattern("d MMM yyyy"))
+        val since = log.firstDay()?.format(DateTimeFormatter.ofPattern(stringResource(R.string.stats_pattern_date_full)))
         if (since != null) {
             Text(
-                "Since $since · ${SandLog.durationLabel(all.seconds)} · ${SandLog.timersLabel(all.finished)} finished",
+                stringResource(R.string.stats_since, since, durationLabel(res, all.seconds), timersLabel(res, all.finished)),
                 color = Color.White.copy(alpha = 0.5f), fontSize = 12.sp,
             )
         }
         if (app.link.linked) {
-            Text("Includes the time from your linked Mac.", color = Color.White.copy(alpha = 0.5f), fontSize = 12.sp)
+            Text(stringResource(R.string.stats_includes_mac), color = Color.White.copy(alpha = 0.5f), fontSize = 12.sp)
         }
+    }
+}
+
+/** The word for a span of the record, as the segmented buttons say it. */
+private fun periodName(p: SandLog.Period) = when (p) {
+    SandLog.Period.HOURLY -> R.string.stats_period_hourly
+    SandLog.Period.DAILY -> R.string.stats_period_daily
+    SandLog.Period.WEEKLY -> R.string.stats_period_weekly
+    SandLog.Period.MONTHLY -> R.string.stats_period_monthly
+    SandLog.Period.YEARLY -> R.string.stats_period_yearly
+}
+
+/** The selected bar in words: a named span, or its start as the date the app's language writes it. */
+@Composable
+private fun bucketTitle(bucket: SandLog.Bucket, period: SandLog.Period): String = when (bucket.title) {
+    SandLog.Bucket.Title.THIS_HOUR -> stringResource(R.string.stats_title_this_hour)
+    SandLog.Bucket.Title.LAST_HOUR -> stringResource(R.string.stats_title_last_hour)
+    SandLog.Bucket.Title.TODAY -> stringResource(R.string.stats_title_today)
+    SandLog.Bucket.Title.YESTERDAY -> stringResource(R.string.stats_title_yesterday)
+    SandLog.Bucket.Title.THIS_WEEK -> stringResource(R.string.stats_title_this_week)
+    SandLog.Bucket.Title.THIS_MONTH -> stringResource(R.string.stats_title_this_month)
+    SandLog.Bucket.Title.THIS_YEAR -> stringResource(R.string.stats_title_this_year)
+    SandLog.Bucket.Title.DATED -> when (period) {
+        SandLog.Period.HOURLY -> bucket.start.format(DateTimeFormatter.ofPattern(stringResource(R.string.stats_pattern_hourly)))
+        SandLog.Period.DAILY -> bucket.start.format(DateTimeFormatter.ofPattern(stringResource(R.string.stats_pattern_daily)))
+        SandLog.Period.WEEKLY -> stringResource(
+            R.string.stats_title_week_of,
+            bucket.start.format(DateTimeFormatter.ofPattern(stringResource(R.string.stats_pattern_day_short))),
+        )
+        SandLog.Period.MONTHLY -> bucket.start.format(DateTimeFormatter.ofPattern(stringResource(R.string.stats_pattern_month)))
+        SandLog.Period.YEARLY -> bucket.start.year.toString()
     }
 }
 
 @Composable
 private fun Breakdown(projects: Map<String, io.github.and.sandtimer.data.Tally>, list: ProjectList) {
+    val res = LocalContext.current.resources
     val parts = list.ordered(projects.keys).mapNotNull { id -> projects[id]?.takeIf { it.seconds >= 1 }?.let { id to it } }
     if (parts.size < 2 && parts.firstOrNull()?.first.isNullOrEmpty()) return
     Spacer(Modifier.height(6.dp))
@@ -103,7 +139,7 @@ private fun Breakdown(projects: Map<String, io.github.and.sandtimer.data.Tally>,
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(8.dp).clip(CircleShape).background(projectColor(id, list)))
             Text(
-                "  ${list.name(id)}  ${SandLog.durationLabel(tally.seconds)}",
+                stringResource(R.string.stats_legend_item, list.displayName(id), durationLabel(res, tally.seconds)),
                 color = Color.White.copy(alpha = 0.75f), fontSize = 13.sp,
             )
         }
@@ -175,7 +211,7 @@ private fun Legend(ids: Set<String>, list: ProjectList) {
         for (id in list.ordered(ids)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.size(8.dp).clip(CircleShape).background(projectColor(id, list)))
-                Text(" ${list.name(id)}", color = Color.White.copy(alpha = 0.6f), fontSize = 12.sp)
+                Text(" " + list.displayName(id), color = Color.White.copy(alpha = 0.6f), fontSize = 12.sp)
             }
         }
     }
