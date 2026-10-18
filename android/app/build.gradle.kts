@@ -15,6 +15,8 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0.0"
+        // Keep only the languages the app itself speaks; the libraries ship dozens more.
+        resourceConfigurations += listOf("en", "zh")
     }
 
     buildTypes {
