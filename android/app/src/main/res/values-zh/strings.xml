@@ -50,7 +50,13 @@
     <string name="settings_timer_title">计时器</string>
     <string name="settings_chime">时间到时响铃</string>
     <string name="settings_sand_sound">沙子流动的声音</string>
-    <string name="settings_sand_sound_summary">沙漏运行且计时页面显示时，播放轻柔的沙沙声。音量跟随媒体音量。</string>
+    <string name="settings_sand_sound_summary">沙漏运行且计时页面显示时，播放轻柔的沙沙声；也可在下方换成你自己挑选的声音。音量跟随媒体音量。</string>
+    <string name="settings_sand_sound_choose">选择声音…</string>
+    <string name="settings_sand_sound_preview">试听</string>
+    <string name="settings_sand_sound_reset">恢复默认沙声</string>
+    <string name="settings_sand_sound_current">当前：%1$s</string>
+    <string name="settings_sand_sound_default">默认沙漏声</string>
+    <string name="settings_sand_sound_failed">无法使用该声音，请换一个音频文件试试（不超过 30 MB）。</string>
     <string name="settings_one_thing">一段时间只做一件事</string>
     <string name="settings_one_thing_summary">整个计时期间保持项目不变，结束后才能切换。</string>
     <string name="settings_keep_screen_on">保持屏幕常亮</string>

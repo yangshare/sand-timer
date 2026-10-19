@@ -53,7 +53,13 @@
     <string name="settings_timer_title">Timer</string>
     <string name="settings_chime">Chime when the time is up</string>
     <string name="settings_sand_sound">Sound of the falling sand</string>
-    <string name="settings_sand_sound_summary">A soft rush of sand while the hourglass runs and the timer is showing. Its loudness follows the media volume.</string>
+    <string name="settings_sand_sound_summary">While the hourglass runs and the timer is showing, a soft rush of sand — or a sound of your own, chosen below. Its loudness follows the media volume.</string>
+    <string name="settings_sand_sound_choose">Choose a sound…</string>
+    <string name="settings_sand_sound_preview">Preview</string>
+    <string name="settings_sand_sound_reset">Back to the built-in sand</string>
+    <string name="settings_sand_sound_current">Now: %1$s</string>
+    <string name="settings_sand_sound_default">the built-in sand</string>
+    <string name="settings_sand_sound_failed">Couldn\'t use that sound. Try another audio file, up to 30 MB.</string>
     <string name="settings_one_thing">One Thing at a Time</string>
     <string name="settings_one_thing_summary">Keeps the project for the whole session. End the session to switch.</string>
     <string name="settings_keep_screen_on">Keep the screen on</string>

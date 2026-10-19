@@ -60,6 +60,7 @@ import io.github.and.sandtimer.link.BadCodeException
 import io.github.and.sandtimer.link.Link
 import io.github.and.sandtimer.timer.Engine
 import io.github.and.sandtimer.timer.Focus
+import io.github.and.sandtimer.timer.SandSound
 
 @Composable
 fun SettingsScreen(modifier: Modifier = Modifier) {
@@ -84,9 +85,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
         Divider()
         Heading(stringResource(R.string.settings_timer_title), null)
         SwitchRow(stringResource(R.string.settings_chime), app.settings.chime) { on -> Store.updateSettings { it.copy(chime = on) } }
-        SwitchRow(stringResource(R.string.settings_sand_sound), app.settings.sandSound) { on -> Store.updateSettings { it.copy(sandSound = on) } }
-        Note(stringResource(R.string.settings_sand_sound_summary))
-        Spacer(Modifier.height(8.dp))
+        SandSoundRow(app.settings.sandSound, app.settings.sandSoundName)
         SwitchRow(stringResource(R.string.settings_one_thing), app.settings.oneThingAtATime) { on -> Store.updateSettings { it.copy(oneThingAtATime = on) } }
         Note(stringResource(R.string.settings_one_thing_summary))
         Spacer(Modifier.height(8.dp))
@@ -193,6 +192,50 @@ private fun OpenOnMacStartRow(on: Boolean) {
         if (on && !allowed) stringResource(R.string.settings_overlay_pending)
         else stringResource(R.string.settings_overlay_summary),
     )
+}
+
+/** The sound of the falling sand: on or off, and which sound — the built-in one, or a file of the person's choosing. */
+@Composable
+private fun SandSoundRow(on: Boolean, name: String?) {
+    val context = LocalContext.current
+    var problem by remember { mutableStateOf<String?>(null) }
+    // A preview still playing is taken along when the settings are left.
+    androidx.compose.runtime.DisposableEffect(Unit) {
+        onDispose { SandSound.stopPreview() }
+    }
+    val choose = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        problem = runCatching {
+            val picked = SandSound.choose(context, uri)
+            Store.updateSettings { it.copy(sandSoundName = picked) }
+            SandSound.preview(context)  // so the person hears what they picked
+            null
+        }.getOrElse { context.getString(R.string.settings_sand_sound_failed) }
+    }
+    SwitchRow(stringResource(R.string.settings_sand_sound), on) { turn ->
+        problem = null
+        Store.updateSettings { it.copy(sandSound = turn) }
+    }
+    Note(stringResource(R.string.settings_sand_sound_summary))
+    Spacer(Modifier.height(8.dp))
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        OutlinedButton(onClick = { problem = null; choose.launch(arrayOf("audio/*")) }) {
+            Text(stringResource(R.string.settings_sand_sound_choose))
+        }
+        OutlinedButton(onClick = { SandSound.preview(context) }) {
+            Text(stringResource(R.string.settings_sand_sound_preview))
+        }
+    }
+    Row(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        Note(stringResource(R.string.settings_sand_sound_current, name ?: stringResource(R.string.settings_sand_sound_default)))
+        if (name != null) {
+            TextButton(onClick = {
+                SandSound.giveUp(context)
+                Store.updateSettings { it.copy(sandSoundName = null) }
+            }) { Text(stringResource(R.string.settings_sand_sound_reset)) }
+        }
+    }
+    problem?.let { Text(it, color = Color(0xFFFF8A80), fontSize = 13.sp) }
 }
 
 /** Do Not Disturb while the sand runs. Turning it on asks Android for permission to manage it, once. */
