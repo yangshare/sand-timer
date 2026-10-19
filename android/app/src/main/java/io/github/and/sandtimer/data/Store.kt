@@ -16,6 +16,8 @@ import java.time.ZoneId
 data class Settings(
     /** Play the chime when the sand runs out. */
     val chime: Boolean = true,
+    /** Murmur of falling sand while the glass runs and the timer is showing. */
+    val sandSound: Boolean = true,
     /** A daily target in minutes; 0 for none. */
     val targetMinutes: Int = 0,
     /** Keep the project for the whole session, as the Mac does by default. */
@@ -95,6 +97,7 @@ object Store {
             linkedLog = linkedLog(obj("linkedLogs")),
             settings = Settings(
                 chime = prefs.getBoolean("chime", true),
+                sandSound = prefs.getBoolean("sandSound", true),
                 targetMinutes = prefs.getInt("targetMinutes", 0),
                 oneThingAtATime = prefs.getBoolean("oneThingAtATime", true),
                 keepScreenOn = prefs.getBoolean("keepScreenOn", true),
@@ -151,7 +154,7 @@ object Store {
 
     fun updateSettings(change: (Settings) -> Settings) {
         val s = change(_state.value.settings)
-        prefs.edit().putBoolean("chime", s.chime).putInt("targetMinutes", s.targetMinutes)
+        prefs.edit().putBoolean("chime", s.chime).putBoolean("sandSound", s.sandSound).putInt("targetMinutes", s.targetMinutes)
             .putBoolean("oneThingAtATime", s.oneThingAtATime).putBoolean("keepScreenOn", s.keepScreenOn)
             .putBoolean("focus", s.focus).putBoolean("calm", s.calm)
             .putBoolean("openOnMacStart", s.openOnMacStart).apply()

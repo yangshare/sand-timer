@@ -55,12 +55,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.background
 import androidx.compose.runtime.withFrameMillis
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import io.github.and.sandtimer.R
 import io.github.and.sandtimer.data.ProjectList
 import io.github.and.sandtimer.data.SandLog
 import io.github.and.sandtimer.data.Store
 import io.github.and.sandtimer.timer.Engine
 import io.github.and.sandtimer.timer.Notifications
+import io.github.and.sandtimer.timer.SandSound
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -92,6 +96,26 @@ fun TimerScreen(modifier: Modifier = Modifier) {
     DisposableEffect(awake) {
         view.keepScreenOn = awake
         onDispose { view.keepScreenOn = false }
+    }
+
+    // The sound of the sand falling, while it runs and the glass is showing: a pause, an end, another tab or the
+    // phone put away all stop it, and coming back takes it up where it is.
+    val sounding = running && app.settings.sandSound
+    val owner = LocalLifecycleOwner.current
+    DisposableEffect(sounding) {
+        val watcher = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> SandSound.update(context, sounding)
+                Lifecycle.Event.ON_PAUSE -> SandSound.stop()
+                else -> {}
+            }
+        }
+        owner.lifecycle.addObserver(watcher)
+        SandSound.update(context, sounding)
+        onDispose {
+            owner.lifecycle.removeObserver(watcher)
+            SandSound.stop()
+        }
     }
 
     // The clean view: everything but the glass fades while the sand runs and the phone is still.

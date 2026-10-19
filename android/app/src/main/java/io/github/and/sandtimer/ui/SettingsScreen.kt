@@ -84,6 +84,9 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
         Divider()
         Heading(stringResource(R.string.settings_timer_title), null)
         SwitchRow(stringResource(R.string.settings_chime), app.settings.chime) { on -> Store.updateSettings { it.copy(chime = on) } }
+        SwitchRow(stringResource(R.string.settings_sand_sound), app.settings.sandSound) { on -> Store.updateSettings { it.copy(sandSound = on) } }
+        Note(stringResource(R.string.settings_sand_sound_summary))
+        Spacer(Modifier.height(8.dp))
         SwitchRow(stringResource(R.string.settings_one_thing), app.settings.oneThingAtATime) { on -> Store.updateSettings { it.copy(oneThingAtATime = on) } }
         Note(stringResource(R.string.settings_one_thing_summary))
         Spacer(Modifier.height(8.dp))
