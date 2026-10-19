@@ -11,7 +11,8 @@ android {
 
     defaultConfig {
         applicationId = "io.github.and.sandtimer"
-        minSdk = 33
+        // Runs back to Android 8; every place a newer call is needed asks Build.VERSION itself.
+        minSdk = 26
         targetSdk = 36
         versionCode = 2
         versionName = "1.1.0"

@@ -132,7 +132,9 @@ private fun LinkSection() {
     val turnOn = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { granted ->
         if (granted.values.all { it }) Link.setEnabled(true) else problem = context.getString(R.string.link_problem_bluetooth_permission)
     }
-    val bluetooth = arrayOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT)
+    val bluetooth = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S)
+        arrayOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT)
+    else arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)  // old Android scans for Bluetooth through location
 
     Heading(stringResource(R.string.settings_link_title), null)
     Note(stringResource(R.string.settings_link_intro))

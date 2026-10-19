@@ -44,7 +44,8 @@ class LinkService : Service() {
         super.onCreate()
         Store.init(this)
         Link.init(this)
-        startForeground(ID, notification(this), ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE)
+        // The three-argument startForeground belongs to Android 9 and up; ServiceCompat stands in for the older ones.
+        androidx.core.app.ServiceCompat.startForeground(this, ID, notification(this), ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE)
         registerReceiver(bluetooth, IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED))
         main.postDelayed(logs, 5 * 60_000L)
     }

@@ -16,6 +16,7 @@ import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Handler
 import android.os.ParcelUuid
 import io.github.and.sandtimer.R
@@ -48,7 +49,9 @@ class Radio(private val context: Context, private val engine: LinkEngine, privat
     var onChange: () -> Unit = {}
 
     val allowed: Boolean
-        get() = listOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT)
+        get() = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+            listOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT)
+        else listOf(Manifest.permission.ACCESS_FINE_LOCATION))  // old Android scans for Bluetooth through location
             .all { context.checkSelfPermission(it) == PackageManager.PERMISSION_GRANTED }
 
     /** Why the phone can't reach the Mac, if it can't. */
@@ -151,8 +154,14 @@ class Radio(private val context: Context, private val engine: LinkEngine, privat
         val frame = outbox.firstOrNull() ?: return
         writing = true
         // A write Android refuses outright leaves the message broken: start the connection over instead.
-        val status = runCatching { gatt.writeCharacteristic(toMac, frame, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT) }
-            .getOrElse { drop(); again(); return }
+        val status = runCatching {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                gatt.writeCharacteristic(toMac, frame, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
+            else {
+                @Suppress("DEPRECATION")
+                if (toMac.setValue(frame)) BluetoothStatusCodes.SUCCESS else -1
+            }
+        }.getOrElse { drop(); again(); return }
         if (status != BluetoothStatusCodes.SUCCESS) {
             writing = false
             main.postDelayed({ pump() }, 50)  // the stack is busy for a moment
@@ -188,7 +197,14 @@ class Radio(private val context: Context, private val engine: LinkEngine, privat
                 return@post
             }
             g.setCharacteristicNotification(toPhone, true)
-            g.writeDescriptor(cccd, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                g.writeDescriptor(cccd, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
+            } else {
+                @Suppress("DEPRECATION")
+                cccd.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
+                @Suppress("DEPRECATION")
+                g.writeDescriptor(cccd)
+            }
         }.let {}
 
         override fun onDescriptorWrite(g: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) = main.post {
@@ -205,7 +221,17 @@ class Radio(private val context: Context, private val engine: LinkEngine, privat
             onChange()
         }.let {}
 
+        // Android 12 and below still report notifications the old way, the value riding on the characteristic itself.
+        override fun onCharacteristicChanged(g: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
+            @Suppress("DEPRECATION")
+            incoming(g, characteristic, characteristic.value)
+        }
+
         override fun onCharacteristicChanged(g: BluetoothGatt, characteristic: BluetoothGattCharacteristic, value: ByteArray) {
+            incoming(g, characteristic, value)
+        }
+
+        private fun incoming(g: BluetoothGatt, characteristic: BluetoothGattCharacteristic, value: ByteArray) {
             val copy = value.copyOf()
             main.post {
                 val peer = peer ?: return@post

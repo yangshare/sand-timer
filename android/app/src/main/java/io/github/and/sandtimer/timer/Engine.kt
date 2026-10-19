@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import io.github.and.sandtimer.data.Store
 import io.github.and.sandtimer.data.Timer
 import io.github.and.sandtimer.data.TimerState
@@ -139,7 +140,9 @@ object Engine {
         )
         val until = state.runningUntil
         if (until != null && until > now()) {
-            if (alarms.canScheduleExactAlarms()) alarms.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, until, intent)
+            // Exact alarms ask permission only from Android 12 on; before that they are simply allowed.
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarms.canScheduleExactAlarms())
+                alarms.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, until, intent)
             else alarms.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, until, intent)
         } else {
             alarms.cancel(intent)

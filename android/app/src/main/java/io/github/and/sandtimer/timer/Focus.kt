@@ -6,6 +6,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.provider.Settings
 import android.service.notification.Condition
 import io.github.and.sandtimer.R
@@ -33,11 +34,31 @@ object Focus {
         if (!allowed(context)) return
         val manager = context.getSystemService(NotificationManager::class.java)
         val on = running && Store.state.value.settings.focus
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            // Before Android 10 a rule can't be switched by hand; the phone's filter itself is set instead.
+            filter(context, manager, on)
+            return
+        }
         val id = rule(context, manager, create = on) ?: return
         runCatching {
             manager.setAutomaticZenRuleState(
                 id, Condition(condition, if (on) context.getString(R.string.focus_condition_running) else "", if (on) Condition.STATE_TRUE else Condition.STATE_FALSE),
             )
+        }
+    }
+
+    /** The old way: Do Not Disturb's priority filter on while the sand runs, and what the phone had before back after. */
+    private fun filter(context: Context, manager: NotificationManager, on: Boolean) {
+        val prefs = context.getSharedPreferences("sandtimer", Context.MODE_PRIVATE)
+        if (on) {
+            val current = manager.currentInterruptionFilter
+            if (current != NotificationManager.INTERRUPTION_FILTER_PRIORITY) {
+                prefs.edit().putInt("focus.filter", current).apply()
+                manager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_PRIORITY)
+            }
+        } else if (manager.currentInterruptionFilter == NotificationManager.INTERRUPTION_FILTER_PRIORITY) {
+            val back = prefs.getInt("focus.filter", NotificationManager.INTERRUPTION_FILTER_ALL)
+            manager.setInterruptionFilter(back)
         }
     }
 

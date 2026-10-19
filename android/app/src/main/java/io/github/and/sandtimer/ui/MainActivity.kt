@@ -2,6 +2,7 @@ package io.github.and.sandtimer.ui
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -63,7 +64,10 @@ class MainActivity : ComponentActivity() {
         if (intent?.getBooleanExtra(SHOW_TIMER, false) == true) showTimerNow()
         enableEdgeToEdge()
         Store.init(this)
-        if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+        // Android 13 asks to be told about notifications; before that they simply are.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
             askNotifications.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
         setContent {
