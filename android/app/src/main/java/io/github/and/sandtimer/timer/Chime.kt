@@ -7,16 +7,23 @@ import android.media.MediaPlayer
 import android.os.Handler
 import android.os.Looper
 import io.github.and.sandtimer.R
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 /**
  * Rings the chime itself, on the alarm stream, rather than leaving it to the notification: phones differ in whether a
  * notification's own sound is played at all, and several play none, but none of them silence a MediaPlayer. Rings over
- * and over until [stop] quiets it — the glass flipped again, or the bell switched off in Settings.
+ * and over until [stop] quiets it — the stop button, the glass flipped again, or the bell switched off in Settings.
  */
 object Chime {
     private var player: MediaPlayer? = null
     private var pending: BroadcastReceiver.PendingResult? = null
     private val main = Handler(Looper.getMainLooper())
+    private val sounding = MutableStateFlow(false)
+
+    /** True while the chime is ringing, so the screen and the notification can offer a way to quiet it. */
+    val ringing: StateFlow<Boolean> = sounding.asStateFlow()
 
     /** How long the broadcast that began the chime is held: the first ring, before the rings after it stand alone. */
     private const val FIRST_RING_MS = 2_500L
@@ -41,14 +48,16 @@ object Chime {
             player.prepare()
             player.start()
             this.player = player
+            sounding.value = true
         }.onFailure {
             player.release()
         }
     }
 
-    /** Quiets a chime still ringing: the glass flipped again, the bell switched off, or the player given out. */
+    /** Quiets a chime still ringing: the stop button, the glass flipped again, or the player given out. */
     fun stop() {
         finishBroadcast()
+        sounding.value = false
         val player = player ?: return
         this.player = null
         runCatching { player.stop() }
@@ -71,6 +80,7 @@ object Chime {
 
     private fun rung(player: MediaPlayer) {
         player.release()
+        sounding.value = false
         if (this.player === player) this.player = null
         finishBroadcast()
     }

@@ -97,18 +97,25 @@ object Notifications {
         val s = Store.state.value
         val manager = context.getSystemService(NotificationManager::class.java)
         manager.cancel(ONGOING_ID)
-        if (s.settings.chime) Chime.play(context)
         val project = s.projects.project(state.project)?.name
         val span = context.resources.getQuantityString(R.plurals.notif_minutes, state.minutes, state.minutes)
-        manager.notify(FINISHED_ID, Notification.Builder(context, DONE)
+        val builder = Notification.Builder(context, DONE)
             .setSmallIcon(R.drawable.ic_notification)
             .setColor(color(s.projects, state.project))
             .setContentTitle(context.getString(R.string.notif_times_up))
-            .setContentText(project?.let { context.getString(R.string.notif_finished_of, span, it) } ?: context.getString(R.string.notif_finished, span))
+            .setContentText(project?.let { context.getString(R.string.notif_finished_of, span, it) }
+                ?: context.getString(R.string.notif_finished, span))
             .setContentIntent(openApp(context))
             .setAutoCancel(true)
             .setCategory(Notification.CATEGORY_ALARM)
-            .build())
+        if (s.settings.chime) {
+            Chime.play(context)
+            // The button is worth its room only while something is sounding to stop.
+            if (Chime.ringing.value) {
+                builder.addAction(action(context, ActionReceiver.ACTION_STOP_CHIME, context.getString(R.string.notif_action_stop_chime)))
+            }
+        }
+        manager.notify(FINISHED_ID, builder.build())
     }
 
     fun clock(ms: Long): String {

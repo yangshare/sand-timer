@@ -13,6 +13,7 @@
     <string name="timer_status_running">计时中</string>
     <string name="status_paused_left">已暂停 · 剩余 %1$s</string>
     <string name="timer_status_idle">轻点沙漏开始</string>
+    <string name="timer_stop_chime">🔕 停止铃声</string>
     <string name="timer_pause">暂停</string>
     <string name="timer_resume">继续</string>
     <string name="timer_end_session">结束计时</string>
@@ -108,6 +109,7 @@
     <string name="notif_finished">%1$s已结束。</string>
     <string name="notif_finished_of">%2$s的%1$s已结束。</string>
     <string name="notif_action_end">结束</string>
+    <string name="notif_action_stop_chime">停止铃声</string>
     <string name="link_connected_to">已连接到%1$s</string>
     <string name="link_looking">正在寻找附近的 Mac</string>
     <string name="focus_condition_running">沙漏运行中</string>

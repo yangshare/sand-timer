@@ -167,6 +167,7 @@ class ActionReceiver : BroadcastReceiver() {
             ACTION_PAUSE -> Engine.pause(context)
             ACTION_RESUME -> Engine.resume(context)
             ACTION_END -> Engine.end(context)
+            ACTION_STOP_CHIME -> Chime.stop()  // only quiet the bell; the timer is over either way
         }
     }
 
@@ -174,6 +175,7 @@ class ActionReceiver : BroadcastReceiver() {
         const val ACTION_PAUSE = "io.github.and.sandtimer.PAUSE"
         const val ACTION_RESUME = "io.github.and.sandtimer.RESUME"
         const val ACTION_END = "io.github.and.sandtimer.END"
+        const val ACTION_STOP_CHIME = "io.github.and.sandtimer.STOP_CHIME"
     }
 }
 

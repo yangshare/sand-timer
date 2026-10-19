@@ -1,5 +1,6 @@
 package io.github.and.sandtimer.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -22,6 +23,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.LinearProgressIndicator
@@ -46,6 +48,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.boundsInWindow
@@ -67,6 +70,7 @@ import io.github.and.sandtimer.R
 import io.github.and.sandtimer.data.ProjectList
 import io.github.and.sandtimer.data.SandLog
 import io.github.and.sandtimer.data.Store
+import io.github.and.sandtimer.timer.Chime
 import io.github.and.sandtimer.timer.Engine
 import io.github.and.sandtimer.timer.Notifications
 import io.github.and.sandtimer.timer.SandSound
@@ -198,7 +202,18 @@ fun TimerScreen(modifier: Modifier = Modifier) {
             )
         }
 
+        val ringing by Chime.ringing.collectAsState()
         Column(Modifier.alpha(controls), horizontalAlignment = Alignment.CenterHorizontally) {
+        // The bell rings until someone quiets it: one big red button that only stops the sound, and starts nothing.
+        AnimatedVisibility(ringing) {
+            Button(
+                onClick = { Chime.stop() },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD94436), contentColor = Color.White),
+                modifier = Modifier.padding(bottom = 12.dp).fillMaxWidth(0.8f).height(56.dp),
+            ) {
+                Text(stringResource(R.string.timer_stop_chime), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            }
+        }
         Text(
             when {
                 running -> sessionProject?.name ?: stringResource(R.string.timer_status_running)

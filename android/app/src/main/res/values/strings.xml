@@ -13,6 +13,7 @@
     <string name="timer_status_running">Running</string>
     <string name="status_paused_left">Paused · %1$s left</string>
     <string name="timer_status_idle">Tap the glass to start</string>
+    <string name="timer_stop_chime">🔕 Stop the chime</string>
     <string name="timer_pause">Pause</string>
     <string name="timer_resume">Resume</string>
     <string name="timer_end_session">End Session</string>
@@ -111,6 +112,7 @@
     <string name="notif_finished">%1$s ran out.</string>
     <string name="notif_finished_of">%1$s of %2$s ran out.</string>
     <string name="notif_action_end">End</string>
+    <string name="notif_action_stop_chime">Stop the chime</string>
     <string name="link_connected_to">Connected to %1$s</string>
     <string name="link_looking">Looking for your Mac nearby</string>
     <string name="focus_condition_running">The sand is running</string>
