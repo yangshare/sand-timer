@@ -58,6 +58,7 @@ import io.github.and.sandtimer.data.ProjectList
 import io.github.and.sandtimer.data.Store
 import io.github.and.sandtimer.link.BadCodeException
 import io.github.and.sandtimer.link.Link
+import io.github.and.sandtimer.timer.Chime
 import io.github.and.sandtimer.timer.Engine
 import io.github.and.sandtimer.timer.Focus
 import io.github.and.sandtimer.timer.SandSound
@@ -84,7 +85,10 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
         }
         Divider()
         Heading(stringResource(R.string.settings_timer_title), null)
-        SwitchRow(stringResource(R.string.settings_chime), app.settings.chime) { on -> Store.updateSettings { it.copy(chime = on) } }
+        SwitchRow(stringResource(R.string.settings_chime), app.settings.chime) { on ->
+            if (!on) Chime.stop()  // turning the bell off quiets one still ringing
+            Store.updateSettings { it.copy(chime = on) }
+        }
         SandSoundRow(app.settings.sandSound, app.settings.sandSoundName)
         SwitchRow(stringResource(R.string.settings_one_thing), app.settings.oneThingAtATime) { on -> Store.updateSettings { it.copy(oneThingAtATime = on) } }
         Note(stringResource(R.string.settings_one_thing_summary))

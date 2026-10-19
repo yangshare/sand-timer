@@ -4,18 +4,24 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.media.AudioAttributes
 import android.media.MediaPlayer
+import android.os.Handler
+import android.os.Looper
 import io.github.and.sandtimer.R
 
 /**
  * Rings the chime itself, on the alarm stream, rather than leaving it to the notification: phones differ in whether a
- * notification's own sound is played at all, and several play none, but none of them silence a MediaPlayer. Rings to
- * the end, then frees itself.
+ * notification's own sound is played at all, and several play none, but none of them silence a MediaPlayer. Rings over
+ * and over until [stop] quiets it — the glass flipped again, or the bell switched off in Settings.
  */
 object Chime {
     private var player: MediaPlayer? = null
-    private var done: (() -> Unit)? = null
+    private var pending: BroadcastReceiver.PendingResult? = null
+    private val main = Handler(Looper.getMainLooper())
 
-    /** Rings the chime, stopping one still ringing. */
+    /** How long the broadcast that began the chime is held: the first ring, before the rings after it stand alone. */
+    private const val FIRST_RING_MS = 2_500L
+
+    /** Rings the chime, stopping one still ringing. Rings until [stop] quiets it. */
     fun play(context: Context) {
         stop()
         val player = MediaPlayer()
@@ -28,6 +34,8 @@ object Chime {
             val wav = app.resources.openRawResourceFd(R.raw.chime)
             player.setDataSource(wav.fileDescriptor, wav.startOffset, wav.length)
             wav.close()
+            player.isLooping = true
+            // A looping player never completes; these only quiet a player that gave out on its own.
             player.setOnCompletionListener { rung(it) }
             player.setOnErrorListener { mp, _, _ -> rung(mp); true }
             player.prepare()
@@ -38,28 +46,38 @@ object Chime {
         }
     }
 
-    /** Quiets a chime still ringing, as when the glass is flipped again before the last one ended. */
+    /** Quiets a chime still ringing: the glass flipped again, the bell switched off, or the player given out. */
     fun stop() {
+        finishBroadcast()
         val player = player ?: return
         this.player = null
-        done = null
         runCatching { player.stop() }
         player.release()
     }
 
-    /** Keeps a broadcast from ending before the chime has rung, so the phone doesn't drop the app mid-note. */
+    /**
+     * Keeps a broadcast from ending before the first ring has sounded, so the phone doesn't drop the app mid-note. A
+     * looping player never completes, so the broadcast is let go once the first ring is out; the rings after it keep
+     * sounding on their own, the way a music app's do.
+     */
     fun thenFinish(pending: BroadcastReceiver.PendingResult) {
         if (player == null) {
             pending.finish()
             return
         }
-        done = { pending.finish() }
+        this.pending = pending
+        main.postDelayed({ finishBroadcast() }, FIRST_RING_MS)
     }
 
     private fun rung(player: MediaPlayer) {
         player.release()
         if (this.player === player) this.player = null
-        done?.invoke()
-        done = null
+        finishBroadcast()
+    }
+
+    private fun finishBroadcast() {
+        main.removeCallbacksAndMessages(null)
+        pending?.finish()
+        pending = null
     }
 }

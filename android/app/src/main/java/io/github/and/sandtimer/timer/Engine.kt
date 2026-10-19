@@ -68,6 +68,7 @@ object Engine {
     }
 
     private fun change(context: Context, edit: (Timer) -> Timer) {
+        Chime.stop()  // a glass flipped, paused, resumed or ended quiets a chime still ringing
         Store.updateTimer(edit)
         sync(context)
         Link.timerChanged()
@@ -78,6 +79,7 @@ object Engine {
      * project there. The time run here so far is counted first, if it was this phone's to count.
      */
     fun adopt(context: Context, timer: SharedTimer, counts: Boolean) {
+        Chime.stop()  // a change made on the Mac quiets the phone's chime too
         val nowMs = now()
         val now = nowMs / 1000.0
         val projects = Store.state.value.projects
