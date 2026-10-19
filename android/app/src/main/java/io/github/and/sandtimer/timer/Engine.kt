@@ -17,6 +17,10 @@ import io.github.and.sandtimer.link.SharedTimer
  * alarm wakes the app for the end.
  */
 object Engine {
+    /** The shortest and longest a flip can be made to give, here or by hand in the timer screen. */
+    const val MIN_MINUTES = 1
+    const val MAX_MINUTES = 180
+
     private fun now() = System.currentTimeMillis()
 
     /** Brings the record up to now: a run that ended while the app was away is put right, the time so far counted. */
@@ -48,7 +52,7 @@ object Engine {
 
     /** How long the next flip gives you. While a session is under way it waits for the next one. */
     fun setMinutes(context: Context, minutes: Int) {
-        Store.updateTimer { it.copy(state = it.state.copy(minutes = minutes.coerceIn(1, 60))) }
+        Store.updateTimer { it.copy(state = it.state.copy(minutes = minutes.coerceIn(MIN_MINUTES, MAX_MINUTES))) }
         sync(context)
         Link.timerChanged()
     }

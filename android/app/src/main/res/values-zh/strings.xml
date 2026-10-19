@@ -17,6 +17,11 @@
     <string name="timer_resume">继续</string>
     <string name="timer_end_session">结束计时</string>
     <string name="chip_pomodoro">25 🍅</string>
+    <string name="chip_custom">自定义…</string>
+    <string name="duration_custom_title">自定义时长</string>
+    <string name="duration_custom_field">分钟数</string>
+    <string name="duration_custom_set">确定</string>
+    <string name="cancel">取消</string>
     <string name="timer_today_target">今日 %1$s，目标 %2$s</string>
     <string name="timer_today">今日 %1$s · 已完成 %2$s</string>
 

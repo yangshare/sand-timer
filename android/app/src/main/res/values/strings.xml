@@ -17,6 +17,11 @@
     <string name="timer_resume">Resume</string>
     <string name="timer_end_session">End Session</string>
     <string name="chip_pomodoro">25 🍅</string>
+    <string name="chip_custom">Custom…</string>
+    <string name="duration_custom_title">Custom length</string>
+    <string name="duration_custom_field">Minutes</string>
+    <string name="duration_custom_set">Set</string>
+    <string name="cancel">Cancel</string>
     <string name="timer_today_target">%1$s of %2$s today</string>
     <string name="timer_today">%1$s today · %2$s finished</string>
 
