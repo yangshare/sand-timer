@@ -1,209 +1,122 @@
-# Sand Timer
+# 沙漏计时器（Sand Timer）
 
-A sand timer that sits on your Mac's desktop, above your other windows. Click it to
-start, and watch the sand run. There's one for iPhone and Android too, and the phone can
-share one timer with the Mac.
+一个摆放在 Mac 桌面上、悬浮于其他窗口之上的沙漏计时器。点击即可开始计时，看着沙子流淌。同时还有 iPhone 和 Android 版本，手机可以与 Mac 共享同一个计时器。
 
 <p align="center">
-  <img src="docs/sand-running.gif" width="260" alt="The Sand Timer running: sand falls in a stream from the top chamber, hollowing a crater as it drains and building a pile below, while the display in the base counts down">
+  <img src="docs/sand-running.gif" width="260" alt="沙漏计时器运行中：沙子从上方玻璃球中如细流般落下，上方逐渐被掏出一个凹坑，下方堆起一座沙堆，底座中的显示屏同时进行倒计时">
 </p>
 
-## Get it
+## 获取
 
-1. Download the **.dmg** from the [latest release](https://github.com/and/sand-timer/releases/latest).
-2. Open it and drag **Sand Timer** into **Applications**.
-3. Open it from Applications. No security warning, no setup, no account.
+1. 从[最新发布页面](https://github.com/and/sand-timer/releases/latest)下载 **.apk** 文件。
+2. 打开后将 **Sand Timer** 拖入**应用程序**文件夹。
+3. 从应用程序中打开。没有安全警告，无需设置，也不需要账号。
 
-Works on macOS 13 Ventura or later, on both Apple Silicon and Intel Macs.
+支持 macOS 13 Ventura 及更高版本，Apple Silicon 和 Intel 芯片的 Mac 均可使用。
 
-The timer has no window of its own and no icon in the Dock — it simply appears on your
-desktop, sitting above whatever you are working in. The first time, a short welcome shows
-how it's worked and offers a few optional choices — what you're working on, what to hear
-while the sand runs, and whether it opens when you log in — then starts your first timer.
-**Getting Started…** in the right-click menu brings it back.
+计时器没有自己的窗口，也不会出现在 Dock 栏中——它只是出现在你的桌面上，悬浮在你正在使用的任何应用之上。首次启动时会显示一段简短的欢迎引导，介绍使用方法并提供几个可选设置——你在做什么工作、沙子流淌时想听什么声音、是否开机自启——然后开始你的第一个计时。右键菜单中的**新手引导…**可以随时重新打开它。
 
 <p align="center">
-  <img src="docs/on-a-mac.png" width="720" alt="A Mac screen with a document open in Chrome and Sand Timer standing in the bottom-right corner, with 9:48 left on its base">
+  <img src="docs/on-a-mac.png" width="720" alt="一台 Mac 的屏幕，Chrome 中打开着文档，沙漏计时器立于右下角，底座显示剩余 9:48">
 </p>
 
-## Using it
+## 使用方法
 
-- **Click** it to start. Click again to pause — it tips onto its side — and once more
-  to carry on.
-- **Done early?** **End Session** in the right-click menu keeps the time you ran (it just
-  doesn't count as a finished timer), lets the sand settle to the bottom, and leaves the
-  timer ready for the next one.
-- **Drag** it wherever you like. Let go and it drops to the bottom of the screen.
-- **Push the top** sideways to tilt it, the way you would nudge a real one. Let go and it
-  rocks back upright; push too far and it topples over and pauses. Lift a toppled timer
-  back up by its top, or pull the top upward to pick it up.
-- **Right-click** for everything else: how long to run (1 to 60 minutes, including a
-  25-minute 🍅 Pomodoro and 6- and 12-minute blocks for billing time), the **Project**,
-  **Appearance** for the colour of the sand, the style of the base and how big it is, the
-  sounds (including an optional gentle chime each minute), **Statistics…**,
-  **Settings…**, and hiding it in the menu bar.
+- **点击**它开始计时。再次点击暂停——沙漏会侧倒——再点一次继续。
+- **提前完成？** 右键菜单中的**结束本次会话**会保留你已计时的时间（只是不算完成一次计时），让沙子全部落到下面，沙漏恢复到待计时的状态。
+- **拖动**它到任意位置。松手后它会落回屏幕底部。
+- **横向推动顶部**可以让它倾斜，就像拨动真实的沙漏一样。松手它会晃回原位；推得太狠它会翻倒并暂停。把翻倒的沙漏从顶部扶起来即可恢复，向上拉顶部则可以把它拿起来。
+- **右键**菜单包含其他所有功能：计时时长（1 到 60 分钟，包括 25 分钟的 🍅 番茄钟，以及计费用的 6 分钟和 12 分钟时长）、**项目**、调整沙子颜色与底座样式和大小的**外观**、声音设置（包括可选的每分钟轻响铃声）、**统计…**、**设置…**，以及将它隐藏到菜单栏。
 
-Quit it, restart your Mac, or update it, and it picks up where it left off: a session
-that was running carries on, a paused one stays paused, and it comes back at the size you
-chose.
+退出应用、重启 Mac 或升级之后，它会从上次的状态继续：正在进行的会话继续计时，暂停的保持暂停，并按你选择的大小重新出现。
 
-### A daily target
+### 每日目标
 
-Set one in **Settings…**, in minutes or hours, and a groove along the timer's base fills
-with sand as the day's time runs — marked at round amounts of time, like each hour of a
-three-hour target, and glowing softly once you reach it. Rest the pointer on the base and
-the line gives way to the figure, printed in the plastic like the time above it:
-`1:18:42/3:00:00`. With the timer hidden in the menu bar, the figure shows there beside
-the time left.
+在**设置…**中设定一个目标（以分钟或小时计），沙漏底座上的一条凹槽会随着当天计时时间的累积逐渐填满沙子——凹槽上标有整点刻度，比如三小时目标中的每个整点，达成目标后会微微发光。把鼠标指针悬停在底座上，刻度线会变成具体数字，像上方的剩余时间一样印在塑料上：`1:18:42/3:00:00`。当计时器隐藏在菜单栏时，该数字也会显示在菜单栏的剩余时间旁边。
 
-### Projects
+### 项目
 
-Make projects in **Settings…**, each with a name and any colour, and the time you run is
-counted against whichever one is on. The sand takes the project's colour, and its name is
-printed faintly on the top cap, brightening when you hover over the timer, so the time
-stays the thing you look at.
+在**设置…**中创建项目，每个项目有名称和任意颜色，你计的时间会计入当前选中的项目。沙子会呈现项目的颜色，项目名会淡淡地印在顶部盖子上，悬停在沙漏上时会变亮，让时间始终是视觉焦点。
 
-- **Switch** from **Project** in the right-click menu (or the menu bar), or **shake the
-  timer** side to side to move on to the next project ticked for **Shake**.
-- **One Thing at a Time**, on to begin with, keeps the project for the whole session, so
-  you aren't tempted to hop between things mid-flow. During a session the projects in the
-  menu wait, and shaking does nothing; choose **End Session** (it's right there in the
-  Project menu) when you're ready, then pick the next one.
-- Time is kept against the project itself, not its name or colour, so renaming or
-  recolouring one never disturbs its history, and removing one keeps its time in
-  Statistics.
+- 从右键菜单（或菜单栏）的**项目**中**切换**，或者**左右摇晃沙漏**切换到下一个勾选了**摇一摇**的项目。
+- **一次只做一件事**默认开启，会在整个会话期间锁定当前项目，避免你在专注中途频繁跳来跳去。会话进行中，菜单里的项目会处于等待状态，摇晃也不起作用；准备好了就选择**结束本次会话**（就在项目菜单里），然后再选下一个。
+- 时间记录与项目本身绑定，而不是它的名称或颜色，因此重命名或改色不会影响历史记录，删除项目后其时间仍会保留在统计中。
 
-### Statistics
+### 统计
 
-**Statistics…** keeps a tally: how long the sand ran and how many timers you finished,
-hour by hour, day by day, week by week, month by month and year by year. Hover a bar to
-read it off. Once you use projects, each bar is split by project in their colours, with a
-legend, a breakdown of the span you're looking at, and a menu to narrow the chart to one
-project. It counts only time the sand was actually running, and it never leaves your Mac —
-unless you link a phone (see below) or ask it to: **Export…** saves the whole record as a CSV file, grouped the way
-you are looking at it, with a column for each project, for a spreadsheet or a timesheet.
+**统计…**保存完整的记录：沙子流淌了多久、完成了多少次计时，按小时、天、周、月、年逐级汇总。悬停在柱状图上即可查看数值。使用项目功能后，每根柱子会按项目以各自的颜色拆分显示，配有图例、当前时间范围的分类汇总，以及一个可将图表筛选为单一项目的菜单。它只统计沙子真正流淌的时间，且数据永远不会离开你的 Mac——除非你连接了手机（见下文）或主动导出：**导出…**会将全部记录保存为 CSV 文件，按你当前查看的方式分组，每个项目一列，方便导入表格或工时表。
 
 <p align="center">
-  <img src="docs/statistics.png" width="470" alt="The Statistics window in its Daily view: today at 1h 27m with 3 timers finished and a breakdown of DSA 50m and AI 37m, a bar for each of the last fourteen days split into purple DSA, blue AI and pink Reading, a legend under the chart, an All Projects menu, and a line along the bottom giving the total since the first day beside an Export button">
+  <img src="docs/statistics.png" width="470" alt="统计窗口的每日视图：今天 1 小时 27 分，完成 3 次计时，分类汇总为 DSA 50 分钟和 AI 37 分钟；过去十四天每天一根柱子，按紫色 DSA、蓝色 AI 和粉色阅读拆分；图表下方有图例和“全部项目”菜单；底部一行显示自第一天以来的总计，旁边是导出按钮">
 </p>
 
-### Settings
+### 设置
 
-**Settings…** has four tabs, and changes take effect straight away:
+**设置…**有四个标签页，所有更改即时生效：
 
-- **General**: the daily target, whether the timer starts when you log in, whether it stays
-  where you drop it or falls to the bottom of the screen (**Float Anywhere**), whether Claude
-  and Shortcuts may work it, and whether it checks for updates.
-- **Projects**: the projects and **One Thing at a Time**.
-- **Sound**: what plays while the sand runs, how loud and how soft.
-- **Phone & Focus**: linking a phone, and Do Not Disturb while the sand runs.
+- **通用**：每日目标、是否开机自启、沙漏是停留在放下位置还是落回屏幕底部（**任意悬浮**）、是否允许 Claude 和快捷指令控制计时器、是否检查更新。
+- **项目**：管理项目以及**一次只做一件事**。
+- **声音**：沙子流淌时播放什么，音量大小，以及柔和程度。
+- **手机与专注**：连接手机，以及沙子流淌期间开启勿扰模式。
 
-The app checks once a day whether a newer version has been released, and if there is one
-the menu offers it — it only ever opens the release page in your browser, and downloads
-and installs nothing by itself. **Check for Updates** in Settings turns that off, and with
-it off the app makes no network calls at all. The offer sits at the foot of the menu,
-beside the line that says which version you are running.
+应用每天检查一次是否有新版本发布，如有新版本会在菜单中提供——它只会打开浏览器中的发布页面，不会自行下载或安装任何东西。**设置**中的**检查更新**可以关闭此功能，关闭后应用不会发起任何网络请求。更新提示位于菜单底部，紧挨着显示当前版本的那一行。
 
-When the time is up it chimes. If you would rather keep it out of the way, hide it to
-the menu bar and the time left shows up there instead, where you can pause, resume and
-restart it and change the sounds. It carries on as it was, sounds and all: what you hear
-follows the menu, not whether the timer is on screen.
+时间结束时它会响铃。如果你想让它不碍事，可以将它隐藏到菜单栏，剩余时间会显示在那里，你还可以在菜单栏中暂停、继续、重新开始计时以及更改声音。它的运行状态不受影响，声音照常：你听到的声音跟随菜单设置，而不是沙漏是否显示在屏幕上。
 
-**Sound** in the menu picks one thing to hear while the sand runs: **Silence** (where it
-starts), **Falling Sand**, or a steady noise to work to — **White** (a hiss), **Pink** (like
-rain) or **Brown** (a low rumble). It fades in as the sand starts and out on a pause, an end
-or the sand running out. The same menu switches the short sounds on and off — the flip, a
-fall and the finish, and an optional chime each minute — and Settings has the volume, and a
-softness that muffles the noises' highs.
+菜单中的**声音**可以选择沙子流淌时听到的一种声音：**静音**（默认状态）、**落沙声**，或适合工作时聆听的持续噪音——**白噪音**（嘶嘶声）、**粉噪音**（如雨声）或**棕噪音**（低沉的隆隆声）。声音会随沙子开始流淌而淡入，在暂停、结束或沙子流尽时淡出。同一个菜单还可以开关短促音效——翻转声、落地声、结束音，以及可选的每分钟轻响；设置中有音量控制，以及一个可以让噪音高频变闷的柔和度调节。
 
-**Do Not Disturb while the sand runs**, in Settings' **Phone & Focus**, turns Do Not Disturb on as
-the sand starts and off at a pause, an end or the sand running out. macOS lets apps do that only
-through Shortcuts, so the app comes with two: **Add Shortcuts…** puts **Sand Timer Focus On** and
-**Sand Timer Focus Off** in the Shortcuts app (open either there to pick another Focus, such as
-Work). With **Share Across Devices** on in Focus settings, your iPhone follows the Mac.
+**沙子流淌期间勿扰**位于设置的**手机与专注**中，会在沙子开始流淌时开启勿扰模式，在暂停、结束或流尽时关闭。macOS 只允许应用通过快捷指令实现这一功能，因此应用自带两个快捷指令：**添加快捷指令…**会在快捷指令应用中创建 **Sand Timer Focus On** 和 **Sand Timer Focus Off**（在快捷指令应用中打开任意一个即可换成其他专注模式，比如工作）。开启专注设置中的**跨设备共享**后，你的 iPhone 会跟随 Mac 同步。
 
-### On your phone
+### 手机版
 
-There is a Sand Timer for iPhone and for Android, with the same glass as the Mac, drawn the
-same way: tap it to flip it, tap again to pause (it lies on its side). Each has the lengths
-from the Mac's menu, projects, a daily target along the base, a chime when the time is up,
-and its own Statistics. Neither needs a Mac or an account.
+iPhone 和 Android 上都有沙漏计时器，与 Mac 版使用同样的玻璃沙漏、同样的绘制方式：点按翻转，再点暂停（沙漏侧躺）。它们都具备 Mac 菜单中的时长选项、项目功能、底座上的每日目标、结束时响铃，以及各自的统计功能。两者都不需要 Mac 或账号。
 
-- **The screen stays on** while the sand runs and the timer is showing.
-- **Clean view**: while the sand runs and the phone lies still, everything but the glass
-  fades away and the glass moves to the middle of the screen. Move or touch the phone to
-  bring the rest back.
-- **On Android**, a notification counts down with Pause and End, and **Do Not Disturb while
-  the sand runs** turns on a Do Not Disturb mode called Sand Timer until the sand stops.
+- 沙子流淌且计时器显示时，**屏幕保持常亮**。
+- **纯净视图**：沙子流淌且手机静止时，除玻璃沙漏外的一切都会淡出，沙漏移至屏幕中央。移动或触碰手机即可恢复。
+- **Android 上**，通知栏会显示倒计时并提供暂停和结束按钮，**沙子流淌期间勿扰**会开启名为 Sand Timer 的勿扰模式，直到沙子停止流淌。
 
-Each can be turned off in the phone's Settings. The phone apps aren't in the App Store or
-the Play Store yet; [BUILDING.md](BUILDING.md) says how to build them from `ios/` and
-`android/`.
+以上功能均可在手机版设置中关闭。手机应用尚未上架 App Store 或 Play Store；[BUILDING.md](BUILDING.md) 介绍了如何从 `ios/` 和 `android/` 目录构建。
 
-### Linking a phone to your Mac
+### 将手机连接到 Mac
 
-Linking is optional, and off until you turn it on; until then neither the Mac nor the phone
-touches Bluetooth.
+连接是可选功能，默认关闭；在开启之前，Mac 和手机都不会使用蓝牙。
 
-1. On the Mac, open **Settings… › Phone & Focus**, turn on **Link with a phone**, and click
-   **Link a Phone…**. A QR code appears.
-2. On the phone, open **Settings**, turn on **Link to a Mac**, and scan the code.
+1. 在 Mac 上打开**设置… › 手机与专注**，开启**连接手机**，点击**连接手机…**，屏幕上会出现一个二维码。
+2. 在手机上打开**设置**，开启**连接 Mac**，然后扫描二维码。
 
-You can link an iPhone and an Android phone at the same time. From then on, whenever the
-phone is near the Mac, the two talk over Bluetooth and share one timer: flip it on either and
-both glasses run, pause it on either and both lie down. Only the device that started a
-session counts its time, so nothing is counted twice. They also share one list of projects,
-and each counts the other's time in Statistics and toward the daily target. Apart, each
-carries on alone, and they catch up when they're near again.
+可以同时连接一部 iPhone 和一部 Android 手机。连接后，只要手机在 Mac 附近，两者就会通过蓝牙通信并共享同一个计时器：在任一设备上翻转，两边的沙漏都会流动；在任一设备上暂停，两边的沙漏都会侧躺。只有发起会话的设备会计入时间，因此不会有任何重复计数。它们还共享同一个项目列表，各自在统计和每日目标中计入对方的时间。分开时各自独立运行，重新靠近后会自动同步。
 
-On Android, **Open when the Mac starts the timer** brings Sand Timer forward as the Mac flips
-the glass, waking the phone and showing the glass over the lock screen the way an alarm does
-(it asks once to be allowed to display over other apps). iOS doesn't let an app bring itself
-forward.
+在 Android 上，开启**Mac 开始计时时自动打开**后，Mac 翻转沙漏时会把沙漏计时器调到前台，唤醒手机并以闹钟的方式在锁屏界面上显示沙漏（会一次性请求"显示在其他应用上层"的权限）。iOS 不允许应用将自己调到前台。
 
-Everything goes straight between your devices, encrypted with a key that only the QR code
-carries; nothing goes through the internet. The code works as a password while it's on
-screen, so it closes itself after two minutes. **Unlink All** on the Mac forgets every phone,
-and each phone keeps its own record.
+所有数据都在你的设备之间直接传输，使用仅由二维码携带的密钥加密；不经过任何互联网服务器。二维码在屏幕上显示时相当于密码，因此两分钟后会自动关闭。Mac 上的**解除所有连接**会忘记所有手机，各手机保留自己的记录。
 
-## What it does
+## 它的表现
 
-The sand behaves like sand. A crater deepens in the top as it drains, a pile builds up
-underneath, and the stream loosens as it falls. A short timer gets a wide neck and a
-thick stream, and a long one a narrow neck and a fine trickle, so the sand always
-finishes when it should.
+沙子的表现和真实的沙子一样。上方玻璃球随着沙子流出被掏出越来越深的凹坑，下方逐渐堆起沙堆，沙流在下落过程中会变得松散。短计时的沙漏颈口较宽、沙流较粗，长计时的颈口较窄、沙流较细，因此沙子总会在该结束的时候恰好流完。
 
-Pick it up and drop it, shake it, or knock it over, and the sand reacts the way you
-would expect. Flip it and the display in the base turns over with it.
+拿起它再放下、摇晃它，或者把它碰倒，沙子都会做出符合直觉的反应。翻转沙漏时，底座中的显示屏也会随之翻转。
 
-It's drawn to look like the real thing: grains of several tones with the odd glint, lit
-from above and shaded where they press on the glass; walls that darken through thicker
-glass, a window reflected in the bulbs, and a shadow on whatever it stands on. Pick any
-colour of sand, from purple to plain Sand.
+它的绘制力求逼真：多种色调的沙粒中偶尔闪过一点亮光，光从上方照射，沙粒挤压玻璃处形成阴影；较厚的玻璃壁颜色更深，玻璃球上映着窗户的倒影，沙漏在所放置的表面上投下阴影。沙子颜色任选，从紫色到朴素的沙色。
 
-The sounds were made to match what you are seeing: sand landing on glass at first, then
-on sand as the pile grows, a rattle while you shake it, and a chime at the end.
+声音也与画面相配：开始时是沙子落在玻璃上的声音，随着沙堆长高变成落在沙子上的声音，摇晃时有沙沙的晃动声，结束时是一声铃声。
 
 <p align="center">
-  <img src="docs/theme-amber.png" width="190" alt="The timer with green sand and a matching green base">
-  <img src="docs/theme-rose-dark.png" width="190" alt="The timer with rose sand on a dark desktop">
+  <img src="docs/theme-amber.png" width="190" alt="绿色沙子和配套绿色底座的沙漏计时器">
+  <img src="docs/theme-rose-dark.png" width="190" alt="深色桌面上玫瑰色沙子的沙漏计时器">
 </p>
 
-## Ask Claude about your time
+## 用 Claude 查询你的时间数据
 
-The app ships a small MCP server, so Claude can read the record and answer questions about
-it — "how much did I focus this week?", "which days do I actually get deep work done?",
-"put September's hours in my invoice". Point Claude at it once.
+应用内置一个小型 MCP 服务器，Claude 可以读取计时记录并回答相关问题——"我这周专注了多久？""我哪几天真正完成了深度工作？""把九月的工时放进我的发票里。"只需让 Claude 指向它一次。
 
-**Claude Code**, one line:
+**Claude Code**，一行命令：
 
 ```sh
 claude mcp add sand-timer -- /Applications/SandTimer.app/Contents/MacOS/sand-timer-mcp
 ```
 
-**Claude Desktop**: open **Settings → Developer → Edit Config**, which opens
-`~/Library/Application Support/Claude/claude_desktop_config.json`, and add the timer under
-`mcpServers`:
+**Claude Desktop**：打开**设置 → 开发者 → 编辑配置**，这会打开
+`~/Library/Application Support/Claude/claude_desktop_config.json`，在 `mcpServers` 下添加计时器：
 
 ```json
 {
@@ -215,34 +128,22 @@ claude mcp add sand-timer -- /Applications/SandTimer.app/Contents/MacOS/sand-tim
 }
 ```
 
-If the file already has other servers, add `"sand-timer"` beside them rather than replacing
-the block — and mind the commas, since Claude Desktop ignores the whole file if the JSON is
-invalid. Quit Claude Desktop and open it again; the timer then appears in the tools menu.
+如果文件中已有其他服务器，请在它们旁边添加 `"sand-timer"` 而不是替换整个配置块——并注意逗号，因为 JSON 无效时 Claude Desktop 会忽略整个文件。退出 Claude Desktop 并重新打开，计时器就会出现在工具菜单中。
 
-It reads what the Statistics window shows — time run and timers finished, by hour, day,
-week, month or year, split by project when you use them, plus the same CSV the Export
-button writes — and it can tell you what the timer is doing right now, and for which
-project. It makes no network calls and nothing is uploaded. Nothing runs
-until Claude asks it something.
+它读取的内容与统计窗口显示的一致——按小时、天、周、月或年统计的计时时间和完成次数，使用项目时按项目拆分，外加导出按钮写入的同一份 CSV——它还能告诉你计时器当前的状态以及对应的项目。它不发起任何网络请求，不上传任何数据。在 Claude 问它问题之前，什么都不会运行。
 
-Claude can also work the timer for you — "start a 20 minute timer", "pause it", "end the session" — but only
-once you allow it: turn on **Control from Claude & Shortcuts** in Settings. It
-is off to begin with, and turning it off again stops the app listening. With it on, the
-timer answers `sandtimer://` links, so Shortcuts, a script or `open sandtimer://start?minutes=25`
-in a terminal can start, pause, resume, restart and end a session too (`sandtimer://end`).
+Claude 还可以替你操作计时器——"开始一个 20 分钟的计时""暂停""结束会话"——但需要你先授权：在设置中开启**允许 Claude 和快捷指令控制**。该选项默认关闭，再次关闭后应用会停止监听。开启后，计时器会响应 `sandtimer://` 链接，因此快捷指令、脚本或终端中的 `open sandtimer://start?minutes=25` 也可以开始、暂停、继续、重新开始和结束会话（`sandtimer://end`）。
 
-## Support it
+## 支持它
 
-Sand Timer is free and open source. If it brightens your desk and you'd like to say
-thanks, you can sponsor it on GitHub or buy me a coffee on Ko-fi. It's entirely
-optional, and the app will always be free.
+沙漏计时器免费且开源。如果它点亮了你的桌面，你想说声谢谢，可以在 GitHub 上赞助，或在 Ko-fi 上请我喝杯咖啡。这完全是可选的，应用永远免费。
 
 <p>
-  <a href="https://github.com/sponsors/and"><img src="https://img.shields.io/badge/Sponsor_on_GitHub-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Sponsor on GitHub" height="36"></a>
+  <a href="https://github.com/sponsors/and"><img src="https://img.shields.io/badge/Sponsor_on_GitHub-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="在 GitHub 上赞助" height="36"></a>
   &nbsp;
-  <a href="https://ko-fi.com/aanand"><img src="https://img.shields.io/badge/Support_on_Ko--fi-FF5E5B?style=for-the-badge&logo=kofi&logoColor=white" alt="Support on Ko-fi" height="36"></a>
+  <a href="https://ko-fi.com/aanand"><img src="https://img.shields.io/badge/Support_on_Ko--fi-FF5E5B?style=for-the-badge&logo=kofi&logoColor=white" alt="在 Ko-fi 上支持" height="36"></a>
 </p>
 
 ---
 
-What's changed in each version: [CHANGELOG.md](CHANGELOG.md). What might come next: [WISHLIST.md](WISHLIST.md). Building from source: see [BUILDING.md](BUILDING.md). Released under the [MIT License](LICENSE).
+每个版本的更新内容见 [CHANGELOG.md](CHANGELOG.md)。未来可能的计划见 [WISHLIST.md](WISHLIST.md)。从源码构建见 [BUILDING.md](BUILDING.md)。基于 [MIT 许可证](LICENSE)发布。
