@@ -1,11 +1,14 @@
 ﻿#Requires -Version 5.1
 # SandTimer 一键发布脚本
-# 用法：双击 scripts\release.bat，或命令行 .\scripts\release.ps1 1.2.0
+# 用法：双击 scripts\release.bat，或命令行 .\scripts\release.ps1 1.2.0 [-Suffix android8]
 # 流程：校验工作区 -> 自动升级 android 版本号 -> 提交 -> 打 tag -> 推送
 #       GitHub Actions 随后自动构建 APK 并发布到 GitHub Releases
 
 param(
-    [string]$Version = ""
+    [string]$Version = "",
+    # 后缀：加到 tag 和 APK 文件名，用于区分不同分支的构建（如 android8）。
+    # 不传时，若当前分支不是 dev/main/master，自动取分支名小写作为后缀。
+    [string]$Suffix = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -29,7 +32,24 @@ if ($Version -notmatch '^\d+\.\d+\.\d+$') {
     Write-Host "错误：版本号格式应为 x.y.z（例如 1.2.0），收到：$Version" -ForegroundColor Red
     exit 1
 }
-$tag = "v$Version"
+# ---- 后缀：非 dev/main 分支自动取分支名，避免两个分支撞 tag ----
+$branch = git branch --show-current
+if (-not $Suffix -and $branch -and $branch -notin @('dev', 'main', 'master')) {
+    $Suffix = $branch.ToLowerInvariant()
+    Write-Host "当前在 $branch 分支，自动加后缀：$Suffix（可用 -Suffix 参数自定义）"
+}
+$Suffix = $Suffix.Trim().Trim('-').ToLowerInvariant()
+if ($Suffix -and $Suffix -notmatch '^[a-z0-9][a-z0-9-]*$') {
+    Write-Host "错误：后缀只能包含小写字母、数字和连字符，收到：$Suffix" -ForegroundColor Red
+    exit 1
+}
+if ($Suffix) {
+    $tag = "v$Version-$Suffix"
+    $apkName = "SandTimer-$Version-$Suffix.apk"
+} else {
+    $tag = "v$Version"
+    $apkName = "SandTimer-$Version.apk"
+}
 
 # ---- 工作区必须干净（发布内容 = 当前提交）----
 $dirty = git status --porcelain
@@ -49,9 +69,9 @@ if (git tag --list $tag) {
     exit 1
 }
 
-$branch = git branch --show-current
 $commit = git log -1 --format="%h %s"
 Write-Host "即将发布 $tag，基于分支 $branch 当前提交："
+Write-Host "构建产物将命名为：$apkName"
 Write-Host "  $commit"
 Write-Host ""
 
@@ -102,5 +122,5 @@ Write-Host " GitHub Actions 正在自动构建 APK："
 Write-Host "   $repoPath/actions"
 Write-Host " 构建成功后 Release 会出现在："
 Write-Host "   $repoPath/releases"
-Write-Host " 其他人直接在 Releases 页下载 SandTimer-$Version.apk 安装即可"
+Write-Host " 其他人直接在 Releases 页下载 $apkName 安装即可"
 Write-Host "===================================="
