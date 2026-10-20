@@ -14,8 +14,8 @@ android {
         // Runs back to Android 8; every place a newer call is needed asks Build.VERSION itself.
         minSdk = 26
         targetSdk = 36
-        versionCode = 2
-        versionName = "1.1.0"
+        versionCode = 3
+        versionName = "1.0.1"
         // Keep only the languages the app itself speaks; the libraries ship dozens more.
         resourceConfigurations += listOf("en", "zh")
     }
