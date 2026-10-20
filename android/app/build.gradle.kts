@@ -13,8 +13,10 @@ android {
         applicationId = "io.github.and.sandtimer"
         minSdk = 33
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.1.0"
+        // Keep only the languages the app itself speaks; the libraries ship dozens more.
+        resourceConfigurations += listOf("en", "zh")
     }
 
     buildTypes {
@@ -37,6 +39,10 @@ android {
     }
     testOptions {
         unitTests.isReturnDefaultValues = true
+    }
+    lint {
+        // The app uses ComponentActivity only; the Fragment/ActivityResult check misfires on release builds.
+        disable += "InvalidFragmentVersionForActivityResult"
     }
 }
 

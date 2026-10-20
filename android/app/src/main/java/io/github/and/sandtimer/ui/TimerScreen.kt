@@ -1,11 +1,13 @@
 package io.github.and.sandtimer.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,13 +21,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,6 +47,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.boundsInWindow
@@ -49,16 +57,23 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.ui.draw.alpha
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.background
 import androidx.compose.runtime.withFrameMillis
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import io.github.and.sandtimer.R
 import io.github.and.sandtimer.data.ProjectList
 import io.github.and.sandtimer.data.SandLog
 import io.github.and.sandtimer.data.Store
+import io.github.and.sandtimer.timer.Chime
 import io.github.and.sandtimer.timer.Engine
 import io.github.and.sandtimer.timer.Notifications
+import io.github.and.sandtimer.timer.SandSound
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -92,6 +107,26 @@ fun TimerScreen(modifier: Modifier = Modifier) {
         onDispose { view.keepScreenOn = false }
     }
 
+    // The sound of the sand falling, while it runs and the glass is showing: a pause, an end, another tab or the
+    // phone put away all stop it, and coming back takes it up where it is.
+    val sounding = running && app.settings.sandSound
+    val owner = LocalLifecycleOwner.current
+    DisposableEffect(sounding) {
+        val watcher = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> SandSound.update(context, sounding)
+                Lifecycle.Event.ON_PAUSE -> SandSound.stop()
+                else -> {}
+            }
+        }
+        owner.lifecycle.addObserver(watcher)
+        SandSound.update(context, sounding)
+        onDispose {
+            owner.lifecycle.removeObserver(watcher)
+            SandSound.stop()
+        }
+    }
+
     // The clean view: everything but the glass fades while the sand runs and the phone is still.
     Calm.Watch(running && app.settings.calm)
     val calm by Calm.hidden.collectAsState()
@@ -107,6 +142,8 @@ fun TimerScreen(modifier: Modifier = Modifier) {
     LaunchedEffect(paused) { tilt.animateTo(if (paused) 90f else 0f, tween(450, easing = FastOutSlowInEasing)) }
     val flip = remember { Animatable(0f) }
     var flipping by remember { mutableLongStateOf(0L) }
+    // Asking for a length of one's own, which the chips don't carry.
+    var customizing by remember { mutableStateOf(false) }
 
     fun press() {
         if (!state.inSession(System.currentTimeMillis())) {
@@ -133,7 +170,7 @@ fun TimerScreen(modifier: Modifier = Modifier) {
         Column(Modifier.alpha(controls), horizontalAlignment = Alignment.CenterHorizontally) {
             ProjectChips(app.projects, app.activeProject, enabled = canSwitch) { Store.setActiveProject(it) }
             if (!canSwitch) {
-                Text("End the session to switch projects.", color = Color.White.copy(alpha = 0.45f), fontSize = 12.sp)
+                Text(stringResource(R.string.timer_switch_locked), color = Color.White.copy(alpha = 0.45f), fontSize = 12.sp)
             }
         }
 
@@ -165,12 +202,23 @@ fun TimerScreen(modifier: Modifier = Modifier) {
             )
         }
 
+        val ringing by Chime.ringing.collectAsState()
         Column(Modifier.alpha(controls), horizontalAlignment = Alignment.CenterHorizontally) {
+        // The bell rings until someone quiets it: one big red button that only stops the sound, and starts nothing.
+        AnimatedVisibility(ringing) {
+            Button(
+                onClick = { Chime.stop() },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD94436), contentColor = Color.White),
+                modifier = Modifier.padding(bottom = 12.dp).fillMaxWidth(0.8f).height(56.dp),
+            ) {
+                Text(stringResource(R.string.timer_stop_chime), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            }
+        }
         Text(
             when {
-                running -> sessionProject?.name ?: "Running"
-                paused -> "Paused · ${Notifications.clock(left)} left"
-                else -> "Tap the glass to start"
+                running -> sessionProject?.name ?: stringResource(R.string.timer_status_running)
+                paused -> stringResource(R.string.status_paused_left, Notifications.clock(left))
+                else -> stringResource(R.string.timer_status_idle)
             },
             color = Color.White.copy(alpha = 0.6f), fontSize = 14.sp,
         )
@@ -178,17 +226,19 @@ fun TimerScreen(modifier: Modifier = Modifier) {
 
         if (state.inSession(now)) {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Button(onClick = { Engine.tap(context) }) { Text(if (running) "Pause" else "Resume") }
-                OutlinedButton(onClick = { Engine.end(context) }) { Text("End Session") }
+                Button(onClick = { Engine.tap(context) }) { Text(if (running) stringResource(R.string.timer_pause) else stringResource(R.string.timer_resume)) }
+                OutlinedButton(onClick = { Engine.end(context) }) { Text(stringResource(R.string.timer_end_session)) }
             }
         } else {
             Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                for (m in lengths) {
+                // A length set by hand keeps its place among the chips until a preset is picked again.
+                for (m in if (state.minutes in lengths) lengths else lengths + state.minutes) {
                     FilterChip(
                         selected = state.minutes == m, onClick = { Engine.setMinutes(context, m) },
-                        label = { Text(if (m == 25) "25 🍅" else "$m") },
+                        label = { Text(if (m == 25) stringResource(R.string.chip_pomodoro) else m.toString()) },
                     )
                 }
+                FilterChip(selected = false, onClick = { customizing = true }, label = { Text(stringResource(R.string.chip_custom)) })
             }
         }
 
@@ -196,6 +246,41 @@ fun TimerScreen(modifier: Modifier = Modifier) {
         }
         Spacer(Modifier.height(8.dp))
     }
+
+    if (customizing) {
+        CustomLengthDialog(current = state.minutes, onDismiss = { customizing = false }) { minutes ->
+            customizing = false
+            Engine.setMinutes(context, minutes)
+        }
+    }
+}
+
+/**
+ * A length of one's own: any whole number of minutes the chips don't carry, from a minute to [Engine.MAX_MINUTES].
+ * The field starts from the length now set, so nudging 60 to 90 means typing a 9 and a 0 over the 6.
+ */
+@Composable
+private fun CustomLengthDialog(current: Int, onDismiss: () -> Unit, set: (Int) -> Unit) {
+    var text by remember { mutableStateOf(current.toString()) }
+    val minutes = text.toIntOrNull()
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.duration_custom_title)) },
+        text = {
+            OutlinedTextField(
+                value = text, singleLine = true,
+                onValueChange = { text = it.filter(Char::isDigit).take(3) },
+                label = { Text(stringResource(R.string.duration_custom_field)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = { set(minutes!!) }, enabled = minutes != null && minutes in Engine.MIN_MINUTES..Engine.MAX_MINUTES) {
+                Text(stringResource(R.string.duration_custom_set))
+            }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
+    )
 }
 
 @Composable
@@ -209,7 +294,7 @@ private fun ProjectChips(projects: ProjectList, active: String?, enabled: Boolea
                 leadingIcon = {
                     Box(Modifier.size(10.dp).clip(CircleShape).background(if (p == null) Color.Gray else sandColor(p.color)))
                 },
-                label = { Text(p?.name ?: ProjectList.UNTITLED) },
+                label = { Text(projects.displayName(id)) },
                 colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Panel),
             )
         }
@@ -219,6 +304,7 @@ private fun ProjectChips(projects: ProjectList, active: String?, enabled: Boolea
 /** Today's time, here and on a linked Mac, against the target if there is one. */
 @Composable
 private fun Today(log: SandLog, counting: Double, targetMinutes: Int) {
+    val res = LocalContext.current.resources
     val day = log.on(LocalDate.now())
     val today = day.copy(seconds = day.seconds + counting)
     Spacer(Modifier.height(16.dp))
@@ -232,12 +318,12 @@ private fun Today(log: SandLog, counting: Double, targetMinutes: Int) {
         )
         Spacer(Modifier.height(6.dp))
         Text(
-            "${SandLog.durationLabel(today.seconds)} of ${SandLog.durationLabel(targetMinutes * 60.0)} today",
+            stringResource(R.string.timer_today_target, durationLabel(res, today.seconds), durationLabel(res, targetMinutes * 60.0)),
             color = Color.White.copy(alpha = 0.6f), fontSize = 13.sp, textAlign = TextAlign.Center,
         )
     } else {
         Text(
-            "${SandLog.durationLabel(today.seconds)} today · ${SandLog.timersLabel(today.finished)} finished",
+            stringResource(R.string.timer_today, durationLabel(res, today.seconds), timersLabel(res, today.finished)),
             color = Color.White.copy(alpha = 0.6f), fontSize = 13.sp,
         )
     }

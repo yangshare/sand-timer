@@ -1,5 +1,7 @@
 package io.github.and.sandtimer.link
 
+import androidx.annotation.StringRes
+import io.github.and.sandtimer.R
 import io.github.and.sandtimer.data.ProjectList
 import io.github.and.sandtimer.data.SandLog
 import kotlinx.serialization.json.Json
@@ -15,6 +17,9 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
 import java.util.UUID
 import kotlin.math.abs
+
+/** The code scanned wasn't a Sand Timer code; [messageRes] is what Settings says about it. */
+class BadCodeException(@StringRes val messageRes: Int) : IllegalArgumentException()
 
 /**
  * The timer as linked devices share it: one timer on every screen. Each device writes it when someone changes the
@@ -204,7 +209,7 @@ class LinkEngine(
 
     /** A phone joining the Mac whose code it scanned. */
     fun link(code: String) {
-        val key = LinkCode.parse(code) ?: throw IllegalArgumentException("That isn't a Sand Timer code. On the Mac, open Sand Timer's Settings and click Link a Phone…")
+        val key = LinkCode.parse(code) ?: throw BadCodeException(R.string.link_bad_code)
         if (!key.contentEquals(this.key ?: ByteArray(0))) forget()
         storage.put(KEY, Crypto.keyToBase64(key))
         storage.put(ENABLED, "true")

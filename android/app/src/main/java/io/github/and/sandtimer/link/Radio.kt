@@ -18,6 +18,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.ParcelUuid
+import io.github.and.sandtimer.R
 import java.util.UUID
 
 /**
@@ -53,9 +54,9 @@ class Radio(private val context: Context, private val engine: LinkEngine, privat
     /** Why the phone can't reach the Mac, if it can't. */
     val problem: String?
         get() = when {
-            adapter == null -> "This phone has no Bluetooth."
-            !allowed -> "Sand Timer needs permission to find your Mac over Bluetooth."
-            !adapter.isEnabled -> "Bluetooth is off."
+            adapter == null -> context.getString(R.string.radio_no_bluetooth)
+            !allowed -> context.getString(R.string.radio_bluetooth_permission)
+            !adapter.isEnabled -> context.getString(R.string.radio_bluetooth_off)
             else -> null
         }
 

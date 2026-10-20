@@ -76,8 +76,8 @@ class LinkService : Service() {
 
         fun createChannel(context: Context) {
             context.getSystemService(NotificationManager::class.java).createNotificationChannel(
-                NotificationChannel(CHANNEL, "Linked to your Mac", NotificationManager.IMPORTANCE_MIN).apply {
-                    description = "Keeps Sand Timer connected to your Mac in the background"
+                NotificationChannel(CHANNEL, context.getString(R.string.notif_link_title), NotificationManager.IMPORTANCE_MIN).apply {
+                    description = context.getString(R.string.notif_link_desc)
                     setShowBadge(false)
                 },
             )
@@ -94,15 +94,15 @@ class LinkService : Service() {
             val mac = link.devices.firstOrNull { it.id in link.connected }
             val text = when {
                 link.problem != null -> link.problem
-                mac != null -> "Connected to ${mac.name}"
-                else -> "Looking for your Mac nearby"
+                mac != null -> context.getString(R.string.link_connected_to, mac.name)
+                else -> context.getString(R.string.link_looking)
             }
             val open = PendingIntent.getActivity(
                 context, 0, Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), PendingIntent.FLAG_IMMUTABLE,
             )
             return Notification.Builder(context, CHANNEL)
                 .setSmallIcon(R.drawable.ic_notification)
-                .setContentTitle("Linked to your Mac")
+                .setContentTitle(context.getString(R.string.notif_link_title))
                 .setContentText(text)
                 .setContentIntent(open)
                 .setOngoing(true)

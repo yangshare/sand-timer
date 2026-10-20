@@ -44,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,48 +52,56 @@ import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import io.github.and.sandtimer.BuildConfig
+import io.github.and.sandtimer.R
 import io.github.and.sandtimer.data.Project
 import io.github.and.sandtimer.data.ProjectList
-import io.github.and.sandtimer.data.SandLog
 import io.github.and.sandtimer.data.Store
+import io.github.and.sandtimer.link.BadCodeException
 import io.github.and.sandtimer.link.Link
+import io.github.and.sandtimer.timer.Chime
 import io.github.and.sandtimer.timer.Engine
 import io.github.and.sandtimer.timer.Focus
+import io.github.and.sandtimer.timer.SandSound
 
 @Composable
 fun SettingsScreen(modifier: Modifier = Modifier) {
     val app by Store.state.collectAsState()
+    val res = LocalContext.current.resources
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp)) {
         LinkSection()
         Divider()
-        Heading("Projects", "Time counts toward the project that's on.")
+        Heading(stringResource(R.string.settings_projects_title), stringResource(R.string.settings_projects_hint))
         ProjectsEditor(app.projects)
         Divider()
-        Heading("Daily target", "A bar under the timer fills as the day's time runs.")
+        Heading(stringResource(R.string.settings_target_title), stringResource(R.string.settings_target_hint))
         val target = app.settings.targetMinutes
-        SwitchRow("Aim for a daily target", target > 0) { on -> Store.updateSettings { it.copy(targetMinutes = if (on) 60 else 0) } }
+        SwitchRow(stringResource(R.string.settings_target_toggle), target > 0) { on -> Store.updateSettings { it.copy(targetMinutes = if (on) 60 else 0) } }
         if (target > 0) {
-            Text(SandLog.durationLabel(target * 60.0) + " a day", color = Color.White.copy(alpha = 0.75f))
+            Text(stringResource(R.string.settings_target_value, durationLabel(res, target * 60.0)), color = Color.White.copy(alpha = 0.75f))
             Slider(
                 value = target.toFloat(), valueRange = 15f..720f, steps = 46,
                 onValueChange = { v -> Store.updateSettings { it.copy(targetMinutes = (v / 15).toInt() * 15) } },
             )
         }
         Divider()
-        Heading("Timer", null)
-        SwitchRow("Chime when the time is up", app.settings.chime) { on -> Store.updateSettings { it.copy(chime = on) } }
-        SwitchRow("One Thing at a Time", app.settings.oneThingAtATime) { on -> Store.updateSettings { it.copy(oneThingAtATime = on) } }
-        Note("Keeps the project for the whole session. End the session to switch.")
+        Heading(stringResource(R.string.settings_timer_title), null)
+        SwitchRow(stringResource(R.string.settings_chime), app.settings.chime) { on ->
+            if (!on) Chime.stop()  // turning the bell off quiets one still ringing
+            Store.updateSettings { it.copy(chime = on) }
+        }
+        SandSoundRow(app.settings.sandSound, app.settings.sandSoundName)
+        SwitchRow(stringResource(R.string.settings_one_thing), app.settings.oneThingAtATime) { on -> Store.updateSettings { it.copy(oneThingAtATime = on) } }
+        Note(stringResource(R.string.settings_one_thing_summary))
         Spacer(Modifier.height(8.dp))
-        SwitchRow("Keep the screen on", app.settings.keepScreenOn) { on -> Store.updateSettings { it.copy(keepScreenOn = on) } }
-        Note("While the sand runs and the timer is showing.")
+        SwitchRow(stringResource(R.string.settings_keep_screen_on), app.settings.keepScreenOn) { on -> Store.updateSettings { it.copy(keepScreenOn = on) } }
+        Note(stringResource(R.string.settings_keep_screen_on_summary))
         Spacer(Modifier.height(8.dp))
-        SwitchRow("Clean view", app.settings.calm) { on -> Store.updateSettings { it.copy(calm = on) } }
-        Note("While the sand runs, everything but the glass fades away after a few still seconds. Move or touch the phone to bring it back.")
+        SwitchRow(stringResource(R.string.settings_clean_view), app.settings.calm) { on -> Store.updateSettings { it.copy(calm = on) } }
+        Note(stringResource(R.string.settings_clean_view_summary))
         Spacer(Modifier.height(8.dp))
         FocusRow(app.settings.focus)
         Divider()
-        Note("Sand Timer ${BuildConfig.VERSION_NAME}. Your time stays on this phone unless you link it to your Mac.")
+        Note(stringResource(R.string.settings_about, BuildConfig.VERSION_NAME))
     }
 }
 
@@ -111,24 +120,23 @@ private fun LinkSection() {
             .addOnSuccessListener { code ->
                 try {
                     Link.link(code.rawValue.orEmpty())
+                } catch (e: BadCodeException) {
+                    problem = context.getString(e.messageRes)
                 } catch (e: Exception) {
-                    problem = e.message ?: "Couldn't link"
+                    problem = e.message ?: context.getString(R.string.link_problem_generic)
                 }
             }
-            .addOnFailureListener { problem = it.message ?: "The scanner didn't open" }
+            .addOnFailureListener { problem = it.message ?: context.getString(R.string.link_problem_scanner) }
     }
     // Bluetooth is asked for only when linking is turned on.
     val turnOn = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { granted ->
-        if (granted.values.all { it }) Link.setEnabled(true) else problem = "Linking needs Bluetooth permission to find your Mac."
+        if (granted.values.all { it }) Link.setEnabled(true) else problem = context.getString(R.string.link_problem_bluetooth_permission)
     }
     val bluetooth = arrayOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT)
 
-    Heading("Link to a Mac", null)
-    Note(
-        "Optional: share one timer, your projects and statistics with Sand Timer on your Mac. The two talk over " +
-            "Bluetooth, encrypted, whenever they're near each other.",
-    )
-    SwitchRow("Link to a Mac", link.enabled) { on ->
+    Heading(stringResource(R.string.settings_link_title), null)
+    Note(stringResource(R.string.settings_link_intro))
+    SwitchRow(stringResource(R.string.settings_link_toggle), link.enabled) { on ->
         problem = null
         when {
             !on -> Link.setEnabled(false)
@@ -137,24 +145,27 @@ private fun LinkSection() {
         }
     }
     if (link.enabled && !link.linked) {
-        Note("On the Mac, open Sand Timer's Settings, turn on Link with a phone, click Link a Phone…, then scan the code it shows.")
+        Note(stringResource(R.string.settings_link_instructions))
         Spacer(Modifier.height(8.dp))
-        Button(onClick = ::scan) { Text("Scan the Mac's Code") }
+        Button(onClick = ::scan) { Text(stringResource(R.string.settings_link_scan)) }
     } else if (link.enabled) {
-        if (link.devices.isEmpty()) Note("Linked. Looking for your Mac nearby…")
+        if (link.devices.isEmpty()) Note(stringResource(R.string.settings_link_searching))
         for (device in link.devices) {
             Text(device.name, color = Color.White, fontWeight = FontWeight.Medium)
             Note(
-                if (device.id in link.connected) "Connected"
-                else "Last seen " + DateUtils.getRelativeTimeSpanString((device.seen * 1000).toLong()).toString().lowercase(),
+                if (device.id in link.connected) stringResource(R.string.settings_link_connected)
+                else stringResource(
+                    R.string.settings_link_last_seen,
+                    DateUtils.getRelativeTimeSpanString((device.seen * 1000).toLong()).toString(),
+                ),
             )
         }
         Spacer(Modifier.height(8.dp))
         Spacer(Modifier.height(8.dp))
         OpenOnMacStartRow(app.settings.openOnMacStart)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            if (!Link.radio.allowed) OutlinedButton(onClick = { turnOn.launch(bluetooth) }) { Text("Allow Bluetooth") }
-            TextButton(onClick = { Link.unlink() }) { Text("Unlink This Phone") }
+            if (!Link.radio.allowed) OutlinedButton(onClick = { turnOn.launch(bluetooth) }) { Text(stringResource(R.string.settings_link_allow_bluetooth)) }
+            TextButton(onClick = { Link.unlink() }) { Text(stringResource(R.string.settings_link_unlink)) }
         }
     }
     (problem ?: link.problem)?.let { Text(it, color = Color(0xFFFF8A80), fontSize = 13.sp) }
@@ -173,7 +184,7 @@ private fun OpenOnMacStartRow(on: Boolean) {
         lifecycle.lifecycle.addObserver(watcher)
         onDispose { lifecycle.lifecycle.removeObserver(watcher) }
     }
-    SwitchRow("Open when the Mac starts the timer", on && allowed) { turnOn ->
+    SwitchRow(stringResource(R.string.settings_overlay_title), on && allowed) { turnOn ->
         Store.updateSettings { it.copy(openOnMacStart = turnOn) }
         if (turnOn && !android.provider.Settings.canDrawOverlays(context)) {
             context.startActivity(
@@ -182,9 +193,53 @@ private fun OpenOnMacStartRow(on: Boolean) {
         }
     }
     Note(
-        if (on && !allowed) "Allow Sand Timer under Display over other apps, then come back."
-        else "Sand Timer comes to the front as the Mac flips the glass, waking the phone and showing over the lock screen if the screen is off.",
+        if (on && !allowed) stringResource(R.string.settings_overlay_pending)
+        else stringResource(R.string.settings_overlay_summary),
     )
+}
+
+/** The sound of the falling sand: on or off, and which sound — the built-in one, or a file of the person's choosing. */
+@Composable
+private fun SandSoundRow(on: Boolean, name: String?) {
+    val context = LocalContext.current
+    var problem by remember { mutableStateOf<String?>(null) }
+    // A preview still playing is taken along when the settings are left.
+    androidx.compose.runtime.DisposableEffect(Unit) {
+        onDispose { SandSound.stopPreview() }
+    }
+    val choose = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        problem = runCatching {
+            val picked = SandSound.choose(context, uri)
+            Store.updateSettings { it.copy(sandSoundName = picked) }
+            SandSound.preview(context)  // so the person hears what they picked
+            null
+        }.getOrElse { context.getString(R.string.settings_sand_sound_failed) }
+    }
+    SwitchRow(stringResource(R.string.settings_sand_sound), on) { turn ->
+        problem = null
+        Store.updateSettings { it.copy(sandSound = turn) }
+    }
+    Note(stringResource(R.string.settings_sand_sound_summary))
+    Spacer(Modifier.height(8.dp))
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        OutlinedButton(onClick = { problem = null; choose.launch(arrayOf("audio/*")) }) {
+            Text(stringResource(R.string.settings_sand_sound_choose))
+        }
+        OutlinedButton(onClick = { SandSound.preview(context) }) {
+            Text(stringResource(R.string.settings_sand_sound_preview))
+        }
+    }
+    Row(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        Note(stringResource(R.string.settings_sand_sound_current, name ?: stringResource(R.string.settings_sand_sound_default)))
+        if (name != null) {
+            TextButton(onClick = {
+                SandSound.giveUp(context)
+                Store.updateSettings { it.copy(sandSoundName = null) }
+            }) { Text(stringResource(R.string.settings_sand_sound_reset)) }
+        }
+    }
+    problem?.let { Text(it, color = Color(0xFFFF8A80), fontSize = 13.sp) }
 }
 
 /** Do Not Disturb while the sand runs. Turning it on asks Android for permission to manage it, once. */
@@ -204,15 +259,14 @@ private fun FocusRow(on: Boolean) {
         lifecycle.lifecycle.addObserver(watcher)
         onDispose { lifecycle.lifecycle.removeObserver(watcher) }
     }
-    SwitchRow("Do Not Disturb while the sand runs", on && allowed) { turnOn ->
+    SwitchRow(stringResource(R.string.settings_focus_title), on && allowed) { turnOn ->
         Store.updateSettings { it.copy(focus = turnOn) }
         if (turnOn && !Focus.allowed(context)) Focus.ask(context)
         Engine.sync(context)
     }
     Note(
-        if (on && !allowed) "Allow Sand Timer under Do Not Disturb access, then come back."
-        else "Turns on a Do Not Disturb mode called Sand Timer while the sand runs, and off when it stops. " +
-            "Change what it lets through in the phone's Modes settings.",
+        if (on && !allowed) stringResource(R.string.settings_focus_pending)
+        else stringResource(R.string.settings_focus_summary),
     )
 }
 
@@ -220,11 +274,13 @@ private fun FocusRow(on: Boolean) {
 private fun ProjectsEditor(projects: ProjectList) {
     for (project in projects.visible) ProjectRow(project, projects)
     Spacer(Modifier.height(6.dp))
+    // The name is said in the app's language now, and kept like any name a person typed.
+    val newName = stringResource(R.string.project_new_name, projects.visible.size + 1)
     OutlinedButton(onClick = {
         val used = projects.visible.map { it.color }.toSet()
         val color = ProjectList.palette.firstOrNull { it !in used } ?: ProjectList.palette[projects.all.size % ProjectList.palette.size]
-        Store.updateProjects(projects.copy(all = projects.all + Project(name = "Project ${projects.visible.size + 1}", color = color)))
-    }) { Text("Add Project") }
+        Store.updateProjects(projects.copy(all = projects.all + Project(name = newName, color = color)))
+    }) { Text(stringResource(R.string.project_add)) }
 }
 
 @Composable
@@ -245,7 +301,7 @@ private fun ProjectRow(project: Project, projects: ProjectList) {
             },
         )
         IconButton(onClick = { change { it.copy(archived = true) } }) {
-            Icon(Icons.Filled.RemoveCircleOutline, contentDescription = "Remove ${project.name}", tint = Color.White.copy(alpha = 0.6f))
+            Icon(Icons.Filled.RemoveCircleOutline, contentDescription = stringResource(R.string.project_remove, project.name), tint = Color.White.copy(alpha = 0.6f))
         }
     }
     if (choosing) {

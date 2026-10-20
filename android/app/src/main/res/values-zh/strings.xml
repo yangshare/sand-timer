@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 应用 -->
+    <string name="app_name">沙漏计时器</string>
+
+    <!-- 底部导航 -->
+    <string name="nav_timer">计时</string>
+    <string name="nav_statistics">统计</string>
+    <string name="nav_settings">设置</string>
+
+    <!-- 计时页 -->
+    <string name="timer_switch_locked">结束本次计时后才能切换项目。</string>
+    <string name="timer_status_running">计时中</string>
+    <string name="status_paused_left">已暂停 · 剩余 %1$s</string>
+    <string name="timer_status_idle">轻点沙漏开始</string>
+    <string name="timer_stop_chime">🔕 停止铃声</string>
+    <string name="timer_pause">暂停</string>
+    <string name="timer_resume">继续</string>
+    <string name="timer_end_session">结束计时</string>
+    <string name="chip_pomodoro">25 🍅</string>
+    <string name="chip_custom">自定义…</string>
+    <string name="duration_custom_title">自定义时长</string>
+    <string name="duration_custom_field">分钟数</string>
+    <string name="duration_custom_set">确定</string>
+    <string name="cancel">取消</string>
+    <string name="timer_today_target">今日 %1$s，目标 %2$s</string>
+    <string name="timer_today">今日 %1$s · 已完成 %2$s</string>
+
+    <!-- 时长与计数（在 ui/Format.kt 解析） -->
+    <plurals name="duration_seconds">
+        <item quantity="other">%1$d秒</item>
+    </plurals>
+    <plurals name="duration_minutes">
+        <item quantity="other">%1$d分</item>
+    </plurals>
+    <string name="duration_hours">%1$d小时</string>
+    <string name="duration_hours_minutes">%1$d小时%2$d分</string>
+    <plurals name="timers_count">
+        <item quantity="other">%1$d 个计时</item>
+    </plurals>
+
+    <!-- 项目 -->
+    <string name="project_none">无项目</string>
+    <string name="project_unknown">未知项目</string>
+    <string name="project_add">新建项目</string>
+    <string name="project_new_name">项目 %1$d</string>
+    <string name="project_remove">移除 %1$s</string>
+
+    <!-- 设置：项目、每日目标、计时器 -->
+    <string name="settings_projects_title">项目</string>
+    <string name="settings_projects_hint">时间计入当前选择的项目。</string>
+    <string name="settings_target_title">每日目标</string>
+    <string name="settings_target_hint">计时器下方的进度条会随当天时间的累积而填满。</string>
+    <string name="settings_target_toggle">设定每日目标</string>
+    <string name="settings_target_value">每日 %1$s</string>
+    <string name="settings_timer_title">计时器</string>
+    <string name="settings_chime">时间到时响铃</string>
+    <string name="settings_sand_sound">沙子流动的声音</string>
+    <string name="settings_sand_sound_summary">沙漏运行且计时页面显示时，播放轻柔的沙沙声；也可在下方换成你自己挑选的声音。音量跟随媒体音量。</string>
+    <string name="settings_sand_sound_choose">选择声音…</string>
+    <string name="settings_sand_sound_preview">试听</string>
+    <string name="settings_sand_sound_reset">恢复默认沙声</string>
+    <string name="settings_sand_sound_current">当前：%1$s</string>
+    <string name="settings_sand_sound_default">默认沙漏声</string>
+    <string name="settings_sand_sound_failed">无法使用该声音，请换一个音频文件试试（不超过 30 MB）。</string>
+    <string name="settings_one_thing">一段时间只做一件事</string>
+    <string name="settings_one_thing_summary">整个计时期间保持项目不变，结束后才能切换。</string>
+    <string name="settings_keep_screen_on">保持屏幕常亮</string>
+    <string name="settings_keep_screen_on_summary">在沙漏运行且计时页面显示时生效。</string>
+    <string name="settings_clean_view">洁净模式</string>
+    <string name="settings_clean_view_summary">沙漏运行且手机静置几秒后，除沙漏外的一切都会淡出。移动或触碰手机即可恢复。</string>
+    <string name="settings_focus_title">沙漏运行时开启勿扰</string>
+    <string name="settings_focus_pending">请在“勿扰模式访问权限”中允许沙漏计时器，然后返回。</string>
+    <string name="settings_focus_summary">沙漏运行时自动开启名为“沙漏计时器”的勿扰模式，停止时关闭。可在系统的“模式”设置中更改其放行内容。</string>
+    <string name="settings_about">沙漏计时器 %1$s。除非连接到你的 Mac，你的时间记录只保存在这台手机上。</string>
+
+    <!-- 设置：连接到 Mac -->
+    <string name="settings_link_title">连接到 Mac</string>
+    <string name="settings_link_intro">可选：与 Mac 上的沙漏计时器共享同一个计时器、项目和统计。两者靠近时通过蓝牙加密通信。</string>
+    <string name="settings_link_toggle">连接到 Mac</string>
+    <string name="settings_link_instructions">在 Mac 上打开沙漏计时器的“设置”，开启“与手机连接”，点按“连接手机…”，然后扫描它显示的二维码。</string>
+    <string name="settings_link_scan">扫描 Mac 的二维码</string>
+    <string name="settings_link_searching">已配对。正在寻找附近的 Mac…</string>
+    <string name="settings_link_connected">已连接</string>
+    <string name="settings_link_last_seen">上次在线：%1$s</string>
+    <string name="settings_link_allow_bluetooth">允许使用蓝牙</string>
+    <string name="settings_link_unlink">断开此手机</string>
+    <string name="settings_overlay_title">Mac 启动计时时自动打开</string>
+    <string name="settings_overlay_pending">请在“显示在其他应用上层”中允许沙漏计时器，然后返回。</string>
+    <string name="settings_overlay_summary">Mac 翻转沙漏时，沙漏计时器会自动来到前台，唤醒手机；若屏幕已熄灭，还会显示在锁屏之上。</string>
+    <string name="link_problem_generic">无法连接</string>
+    <string name="link_problem_scanner">扫码器未能打开</string>
+    <string name="link_problem_bluetooth_permission">连接需要蓝牙权限才能找到你的 Mac。</string>
+
+    <!-- 蓝牙与连接码问题（Radio.kt / LinkEngine.kt） -->
+    <string name="link_bad_code">这不是沙漏计时器的连接码。请在 Mac 上打开沙漏计时器的“设置”，点按“连接手机…”。</string>
+    <string name="radio_no_bluetooth">此手机没有蓝牙。</string>
+    <string name="radio_bluetooth_permission">沙漏计时器需要蓝牙权限来寻找你的 Mac。</string>
+    <string name="radio_bluetooth_off">蓝牙未开启。</string>
+
+    <!-- 通知与连接服务 -->
+    <string name="notif_channel_running">计时进行中</string>
+    <string name="notif_channel_running_desc">沙漏运行或暂停时显示剩余时间</string>
+    <string name="notif_times_up">时间到</string>
+    <string name="notif_channel_done_desc">沙漏漏完时提示，响铃由应用自己播放</string>
+    <string name="notif_link_title">已连接到你的 Mac</string>
+    <string name="notif_link_desc">让沙漏计时器在后台与 Mac 保持连接</string>
+    <string name="notif_title_running">沙漏运行中</string>
+    <string name="notif_finished">%1$s已结束。</string>
+    <string name="notif_finished_of">%2$s的%1$s已结束。</string>
+    <string name="notif_action_end">结束</string>
+    <string name="notif_action_stop_chime">停止铃声</string>
+    <string name="link_connected_to">已连接到%1$s</string>
+    <string name="link_looking">正在寻找附近的 Mac</string>
+    <string name="focus_condition_running">沙漏运行中</string>
+    <plurals name="notif_minutes_timer">
+        <item quantity="other">%1$d 分钟计时</item>
+    </plurals>
+    <plurals name="notif_minutes">
+        <item quantity="other">%1$d 分钟</item>
+    </plurals>
+
+    <!-- 统计 -->
+    <string name="stats_period_hourly">时</string>
+    <string name="stats_period_daily">日</string>
+    <string name="stats_period_weekly">周</string>
+    <string name="stats_period_monthly">月</string>
+    <string name="stats_period_yearly">年</string>
+    <string name="stats_title_this_hour">本小时</string>
+    <string name="stats_title_last_hour">上一小时</string>
+    <string name="stats_title_today">今天</string>
+    <string name="stats_title_yesterday">昨天</string>
+    <string name="stats_title_this_week">本周</string>
+    <string name="stats_title_this_month">本月</string>
+    <string name="stats_title_this_year">今年</string>
+    <string name="stats_title_week_of">%1$s当周</string>
+    <string name="stats_pattern_hourly">EEEE H:00</string>
+    <string name="stats_pattern_daily">M月d日 EEEE</string>
+    <string name="stats_pattern_day_short">M月d日</string>
+    <string name="stats_pattern_month">yyyy年M月</string>
+    <string name="stats_pattern_date_full">yyyy年M月d日</string>
+    <string name="stats_finished">%1$s已完成</string>
+    <string name="stats_since">自%1$s起 · %2$s · 已完成 %3$s</string>
+    <string name="stats_includes_mac">包含已连接 Mac 上的时间。</string>
+    <string name="stats_legend_item">"  %1$s  %2$s"</string>
+</resources>

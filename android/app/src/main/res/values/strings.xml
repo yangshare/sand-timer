@@ -1,4 +1,151 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- App -->
     <string name="app_name">Sand Timer</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_timer">Timer</string>
+    <string name="nav_statistics">Statistics</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Timer screen -->
+    <string name="timer_switch_locked">End the session to switch projects.</string>
+    <string name="timer_status_running">Running</string>
+    <string name="status_paused_left">Paused · %1$s left</string>
+    <string name="timer_status_idle">Tap the glass to start</string>
+    <string name="timer_stop_chime">🔕 Stop the chime</string>
+    <string name="timer_pause">Pause</string>
+    <string name="timer_resume">Resume</string>
+    <string name="timer_end_session">End Session</string>
+    <string name="chip_pomodoro">25 🍅</string>
+    <string name="chip_custom">Custom…</string>
+    <string name="duration_custom_title">Custom length</string>
+    <string name="duration_custom_field">Minutes</string>
+    <string name="duration_custom_set">Set</string>
+    <string name="cancel">Cancel</string>
+    <string name="timer_today_target">%1$s of %2$s today</string>
+    <string name="timer_today">%1$s today · %2$s finished</string>
+
+    <!-- Durations and counts (resolved in ui/Format.kt) -->
+    <plurals name="duration_seconds">
+        <item quantity="one">%1$ds</item>
+        <item quantity="other">%1$ds</item>
+    </plurals>
+    <plurals name="duration_minutes">
+        <item quantity="one">%1$dm</item>
+        <item quantity="other">%1$dm</item>
+    </plurals>
+    <string name="duration_hours">%1$dh</string>
+    <string name="duration_hours_minutes">%1$dh %2$dm</string>
+    <plurals name="timers_count">
+        <item quantity="one">%1$d timer</item>
+        <item quantity="other">%1$d timers</item>
+    </plurals>
+
+    <!-- Projects -->
+    <string name="project_none">No project</string>
+    <string name="project_unknown">Unknown project</string>
+    <string name="project_add">Add Project</string>
+    <string name="project_new_name">Project %1$d</string>
+    <string name="project_remove">Remove %1$s</string>
+
+    <!-- Settings: projects, daily target, timer -->
+    <string name="settings_projects_title">Projects</string>
+    <string name="settings_projects_hint">Time counts toward the project that\'s on.</string>
+    <string name="settings_target_title">Daily target</string>
+    <string name="settings_target_hint">A bar under the timer fills as the day\'s time runs.</string>
+    <string name="settings_target_toggle">Aim for a daily target</string>
+    <string name="settings_target_value">%1$s a day</string>
+    <string name="settings_timer_title">Timer</string>
+    <string name="settings_chime">Chime when the time is up</string>
+    <string name="settings_sand_sound">Sound of the falling sand</string>
+    <string name="settings_sand_sound_summary">While the hourglass runs and the timer is showing, a soft rush of sand — or a sound of your own, chosen below. Its loudness follows the media volume.</string>
+    <string name="settings_sand_sound_choose">Choose a sound…</string>
+    <string name="settings_sand_sound_preview">Preview</string>
+    <string name="settings_sand_sound_reset">Back to the built-in sand</string>
+    <string name="settings_sand_sound_current">Now: %1$s</string>
+    <string name="settings_sand_sound_default">the built-in sand</string>
+    <string name="settings_sand_sound_failed">Couldn\'t use that sound. Try another audio file, up to 30 MB.</string>
+    <string name="settings_one_thing">One Thing at a Time</string>
+    <string name="settings_one_thing_summary">Keeps the project for the whole session. End the session to switch.</string>
+    <string name="settings_keep_screen_on">Keep the screen on</string>
+    <string name="settings_keep_screen_on_summary">While the sand runs and the timer is showing.</string>
+    <string name="settings_clean_view">Clean view</string>
+    <string name="settings_clean_view_summary">While the sand runs, everything but the glass fades away after a few still seconds. Move or touch the phone to bring it back.</string>
+    <string name="settings_focus_title">Do Not Disturb while the sand runs</string>
+    <string name="settings_focus_pending">Allow Sand Timer under Do Not Disturb access, then come back.</string>
+    <string name="settings_focus_summary">Turns on a Do Not Disturb mode called Sand Timer while the sand runs, and off when it stops. Change what it lets through in the phone\'s Modes settings.</string>
+    <string name="settings_about">Sand Timer %1$s. Your time stays on this phone unless you link it to your Mac.</string>
+
+    <!-- Settings: link to a Mac -->
+    <string name="settings_link_title">Link to a Mac</string>
+    <string name="settings_link_intro">Optional: share one timer, your projects and statistics with Sand Timer on your Mac. The two talk over Bluetooth, encrypted, whenever they\'re near each other.</string>
+    <string name="settings_link_toggle">Link to a Mac</string>
+    <string name="settings_link_instructions">On the Mac, open Sand Timer\'s Settings, turn on Link with a phone, click Link a Phone…, then scan the code it shows.</string>
+    <string name="settings_link_scan">Scan the Mac\'s Code</string>
+    <string name="settings_link_searching">Linked. Looking for your Mac nearby…</string>
+    <string name="settings_link_connected">Connected</string>
+    <string name="settings_link_last_seen">Last seen %1$s</string>
+    <string name="settings_link_allow_bluetooth">Allow Bluetooth</string>
+    <string name="settings_link_unlink">Unlink This Phone</string>
+    <string name="settings_overlay_title">Open when the Mac starts the timer</string>
+    <string name="settings_overlay_pending">Allow Sand Timer under Display over other apps, then come back.</string>
+    <string name="settings_overlay_summary">Sand Timer comes to the front as the Mac flips the glass, waking the phone and showing over the lock screen if the screen is off.</string>
+    <string name="link_problem_generic">Couldn\'t link</string>
+    <string name="link_problem_scanner">The scanner didn\'t open</string>
+    <string name="link_problem_bluetooth_permission">Linking needs Bluetooth permission to find your Mac.</string>
+
+    <!-- Link and Bluetooth problems (Radio.kt / LinkEngine.kt) -->
+    <string name="link_bad_code">That isn\'t a Sand Timer code. On the Mac, open Sand Timer\'s Settings and click Link a Phone…</string>
+    <string name="radio_no_bluetooth">This phone has no Bluetooth.</string>
+    <string name="radio_bluetooth_permission">Sand Timer needs permission to find your Mac over Bluetooth.</string>
+    <string name="radio_bluetooth_off">Bluetooth is off.</string>
+
+    <!-- Notifications and the link service -->
+    <string name="notif_channel_running">Timer running</string>
+    <string name="notif_channel_running_desc">The time left, while the sand runs or is paused</string>
+    <string name="notif_times_up">Time\'s up</string>
+    <string name="notif_channel_done_desc">A word when the sand runs out; the chime is rung by the app itself</string>
+    <string name="notif_link_title">Linked to your Mac</string>
+    <string name="notif_link_desc">Keeps Sand Timer connected to your Mac in the background</string>
+    <string name="notif_title_running">Sand running</string>
+    <string name="notif_finished">%1$s ran out.</string>
+    <string name="notif_finished_of">%1$s of %2$s ran out.</string>
+    <string name="notif_action_end">End</string>
+    <string name="notif_action_stop_chime">Stop the chime</string>
+    <string name="link_connected_to">Connected to %1$s</string>
+    <string name="link_looking">Looking for your Mac nearby</string>
+    <string name="focus_condition_running">The sand is running</string>
+    <plurals name="notif_minutes_timer">
+        <item quantity="one">%1$d minute timer</item>
+        <item quantity="other">%1$d minute timer</item>
+    </plurals>
+    <plurals name="notif_minutes">
+        <item quantity="one">%1$d minute</item>
+        <item quantity="other">%1$d minutes</item>
+    </plurals>
+
+    <!-- Statistics -->
+    <string name="stats_period_hourly">Hourly</string>
+    <string name="stats_period_daily">Daily</string>
+    <string name="stats_period_weekly">Weekly</string>
+    <string name="stats_period_monthly">Monthly</string>
+    <string name="stats_period_yearly">Yearly</string>
+    <string name="stats_title_this_hour">This hour</string>
+    <string name="stats_title_last_hour">Last hour</string>
+    <string name="stats_title_today">Today</string>
+    <string name="stats_title_yesterday">Yesterday</string>
+    <string name="stats_title_this_week">This week</string>
+    <string name="stats_title_this_month">This month</string>
+    <string name="stats_title_this_year">This year</string>
+    <string name="stats_title_week_of">Week of %1$s</string>
+    <string name="stats_pattern_hourly">EEEE H:00</string>
+    <string name="stats_pattern_daily">EEEE d MMM</string>
+    <string name="stats_pattern_day_short">d MMM</string>
+    <string name="stats_pattern_month">MMMM yyyy</string>
+    <string name="stats_pattern_date_full">d MMM yyyy</string>
+    <string name="stats_finished">%1$s finished</string>
+    <string name="stats_since">Since %1$s · %2$s · %3$s finished</string>
+    <string name="stats_includes_mac">Includes the time from your linked Mac.</string>
+    <string name="stats_legend_item">"  %1$s  %2$s"</string>
 </resources>

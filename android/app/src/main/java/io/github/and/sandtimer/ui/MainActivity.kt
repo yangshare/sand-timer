@@ -23,6 +23,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.stringResource
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -44,6 +45,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import io.github.and.sandtimer.R
 import io.github.and.sandtimer.data.Store
 import io.github.and.sandtimer.link.Link
 import io.github.and.sandtimer.timer.Engine
@@ -127,8 +129,11 @@ private fun App() {
         contentWindowInsets = WindowInsets.systemBarsIgnoringVisibility,
         bottomBar = {
             NavigationBar(containerColor = Panel, modifier = Modifier.alpha(shown), windowInsets = WindowInsets.navigationBarsIgnoringVisibility) {
-                listOf("Timer" to Icons.Filled.HourglassBottom, "Statistics" to Icons.Filled.BarChart, "Settings" to Icons.Filled.Settings)
-                    .forEachIndexed { index, (title, icon) ->
+                listOf(
+                    stringResource(R.string.nav_timer) to Icons.Filled.HourglassBottom,
+                    stringResource(R.string.nav_statistics) to Icons.Filled.BarChart,
+                    stringResource(R.string.nav_settings) to Icons.Filled.Settings,
+                ).forEachIndexed { index, (title, icon) ->
                         NavigationBarItem(
                             selected = tab == index, onClick = { tab = index },
                             icon = { Icon(icon, contentDescription = null) }, label = { Text(title) },

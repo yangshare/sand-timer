@@ -17,6 +17,10 @@ import io.github.and.sandtimer.link.SharedTimer
  * alarm wakes the app for the end.
  */
 object Engine {
+    /** The shortest and longest a flip can be made to give, here or by hand in the timer screen. */
+    const val MIN_MINUTES = 1
+    const val MAX_MINUTES = 180
+
     private fun now() = System.currentTimeMillis()
 
     /** Brings the record up to now: a run that ended while the app was away is put right, the time so far counted. */
@@ -48,7 +52,7 @@ object Engine {
 
     /** How long the next flip gives you. While a session is under way it waits for the next one. */
     fun setMinutes(context: Context, minutes: Int) {
-        Store.updateTimer { it.copy(state = it.state.copy(minutes = minutes.coerceIn(1, 60))) }
+        Store.updateTimer { it.copy(state = it.state.copy(minutes = minutes.coerceIn(MIN_MINUTES, MAX_MINUTES))) }
         sync(context)
         Link.timerChanged()
     }
@@ -68,6 +72,7 @@ object Engine {
     }
 
     private fun change(context: Context, edit: (Timer) -> Timer) {
+        Chime.stop()  // a glass flipped, paused, resumed or ended quiets a chime still ringing
         Store.updateTimer(edit)
         sync(context)
         Link.timerChanged()
@@ -78,6 +83,7 @@ object Engine {
      * project there. The time run here so far is counted first, if it was this phone's to count.
      */
     fun adopt(context: Context, timer: SharedTimer, counts: Boolean) {
+        Chime.stop()  // a change made on the Mac quiets the phone's chime too
         val nowMs = now()
         val now = nowMs / 1000.0
         val projects = Store.state.value.projects
@@ -146,8 +152,10 @@ object Engine {
 /** The sand ran out. */
 class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
+        val pending = goAsync()
         Store.init(context)
         Engine.settle(context)
+        Chime.thenFinish(pending)
     }
 }
 
@@ -159,6 +167,7 @@ class ActionReceiver : BroadcastReceiver() {
             ACTION_PAUSE -> Engine.pause(context)
             ACTION_RESUME -> Engine.resume(context)
             ACTION_END -> Engine.end(context)
+            ACTION_STOP_CHIME -> Chime.stop()  // only quiet the bell; the timer is over either way
         }
     }
 
@@ -166,6 +175,7 @@ class ActionReceiver : BroadcastReceiver() {
         const val ACTION_PAUSE = "io.github.and.sandtimer.PAUSE"
         const val ACTION_RESUME = "io.github.and.sandtimer.RESUME"
         const val ACTION_END = "io.github.and.sandtimer.END"
+        const val ACTION_STOP_CHIME = "io.github.and.sandtimer.STOP_CHIME"
     }
 }
 

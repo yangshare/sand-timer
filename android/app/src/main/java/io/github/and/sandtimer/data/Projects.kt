@@ -63,8 +63,6 @@ data class ProjectList(val all: List<Project> = emptyList()) {
 
     fun project(id: String?): Project? = if (id.isNullOrEmpty()) null else all.firstOrNull { it.id == id }
 
-    fun name(id: String): String = if (id.isEmpty()) UNTITLED else project(id)?.name ?: "Unknown project"
-
     /** This list after a change made here, with each project that is new or different from [before] stamped [now]. */
     fun stamped(before: ProjectList, now: Double): ProjectList = ProjectList(all.map { project ->
         val old = before.project(project.id)
@@ -114,7 +112,6 @@ data class ProjectList(val all: List<Project> = emptyList()) {
     }
 
     companion object {
-        const val UNTITLED = "No project"
         /** Stamps this close together, in seconds, are the same moment written down by two devices. */
         const val SAME_MOMENT = 0.001
 

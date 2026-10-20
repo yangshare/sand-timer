@@ -8,6 +8,7 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import android.service.notification.Condition
+import io.github.and.sandtimer.R
 import io.github.and.sandtimer.data.Store
 import io.github.and.sandtimer.ui.MainActivity
 
@@ -35,7 +36,7 @@ object Focus {
         val id = rule(context, manager, create = on) ?: return
         runCatching {
             manager.setAutomaticZenRuleState(
-                id, Condition(condition, if (on) "The sand is running" else "", if (on) Condition.STATE_TRUE else Condition.STATE_FALSE),
+                id, Condition(condition, if (on) context.getString(R.string.focus_condition_running) else "", if (on) Condition.STATE_TRUE else Condition.STATE_FALSE),
             )
         }
     }
@@ -46,7 +47,7 @@ object Focus {
         prefs.getString("focus.rule", null)?.let { if (manager.getAutomaticZenRule(it) != null) return it }
         if (!create) return null
         val rule = AutomaticZenRule(
-            "Sand Timer", null, ComponentName(context, MainActivity::class.java), condition, null,
+            context.getString(R.string.app_name), null, ComponentName(context, MainActivity::class.java), condition, null,
             NotificationManager.INTERRUPTION_FILTER_PRIORITY, true,
         )
         val id = runCatching { manager.addAutomaticZenRule(rule) }.getOrNull() ?: return null
