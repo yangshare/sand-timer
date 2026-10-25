@@ -38,7 +38,7 @@ struct SettingsScreen: View {
                     Toggle("One Thing at a Time", isOn: $store.oneThingAtATime)
                     Toggle("Keep the screen on", isOn: $store.keepScreenOn)
                     Toggle("Clean view", isOn: $store.cleanView)
-                } header: { Text("Timer") } footer: { Text("One Thing at a Time keeps the project for the whole session. End the session to switch. The screen stays on while the sand runs and the timer is showing. Clean view fades everything but the glass after a few still seconds; move or touch the phone to bring it back.") }
+                } header: { Text("Timer") } footer: { Text("One Thing at a Time keeps the project for the whole session. End the session to switch. The screen stays on while the sand runs and the timer is showing. Clean view fades everything but the glass after a few seconds; tap the screen to bring it back.") }
 
                 Section {
                     Text("Sand Timer \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""). Your time stays on this phone unless you link it to your Mac.")
