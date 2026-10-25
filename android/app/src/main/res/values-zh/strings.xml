@@ -68,7 +68,7 @@
     <string name="settings_keep_screen_on">保持屏幕常亮</string>
     <string name="settings_keep_screen_on_summary">在沙漏运行且计时页面显示时生效。</string>
     <string name="settings_clean_view">洁净模式</string>
-    <string name="settings_clean_view_summary">沙漏运行且手机静置几秒后，除沙漏外的一切都会淡出。移动或触碰手机即可恢复。</string>
+    <string name="settings_clean_view_summary">沙漏运行几秒后，除沙漏外的一切都会淡出。点一下屏幕即可恢复，碰动手机不受影响。</string>
     <string name="settings_focus_title">沙漏运行时开启勿扰</string>
     <string name="settings_focus_pending">请在“勿扰模式访问权限”中允许沙漏计时器，然后返回。</string>
     <string name="settings_focus_summary">沙漏运行时自动开启名为“沙漏计时器”的勿扰模式，停止时关闭。可在系统的“模式”设置中更改其放行内容。</string>
