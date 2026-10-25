@@ -71,7 +71,7 @@
     <string name="settings_keep_screen_on">Keep the screen on</string>
     <string name="settings_keep_screen_on_summary">While the sand runs and the timer is showing.</string>
     <string name="settings_clean_view">Clean view</string>
-    <string name="settings_clean_view_summary">While the sand runs, everything but the glass fades away after a few still seconds. Move or touch the phone to bring it back.</string>
+    <string name="settings_clean_view_summary">While the sand runs, everything but the glass fades away after a few seconds. Tap the screen to bring it back.</string>
     <string name="settings_focus_title">Do Not Disturb while the sand runs</string>
     <string name="settings_focus_pending">Allow Sand Timer under Do Not Disturb access, then come back.</string>
     <string name="settings_focus_summary">Turns on a Do Not Disturb mode called Sand Timer while the sand runs, and off when it stops. Change what it lets through in the phone\'s Modes settings.</string>

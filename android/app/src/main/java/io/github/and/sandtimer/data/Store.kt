@@ -28,7 +28,7 @@ data class Settings(
     val keepScreenOn: Boolean = true,
     /** Turn on Sand Timer's own Do Not Disturb mode while the sand runs. */
     val focus: Boolean = false,
-    /** While the sand runs, hide everything but the glass until the phone moves. */
+    /** While the sand runs, hide everything but the glass until the screen is tapped. */
     val calm: Boolean = true,
     /** Come to the front when the linked Mac starts the timer, while the screen is on. */
     val openOnMacStart: Boolean = false,
