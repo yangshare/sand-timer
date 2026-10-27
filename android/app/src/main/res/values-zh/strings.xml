@@ -18,7 +18,7 @@
     <string name="timer_resume">继续</string>
     <string name="timer_end_session">结束计时</string>
     <string name="chip_pomodoro">25 🍅</string>
-    <string name="chip_custom">自定义…</string>
+    <string name="sand_sound_toggle">沙沙声开关</string>
     <string name="duration_custom_title">自定义时长</string>
     <string name="duration_custom_field">分钟数</string>
     <string name="duration_custom_set">确定</string>
@@ -46,9 +46,15 @@
     <string name="project_new_name">项目 %1$d</string>
     <string name="project_remove">移除 %1$s</string>
 
-    <!-- 设置：项目、每日目标、计时器 -->
+    <!-- 设置：项目、时长、每日目标、计时器 -->
     <string name="settings_projects_title">项目</string>
     <string name="settings_projects_hint">时间计入当前选择的项目。</string>
+    <string name="settings_durations_title">时长</string>
+    <string name="settings_durations_hint">计时页可选的时长，可在这里添加、修改、删除。</string>
+    <string name="duration_value">%1$d 分钟</string>
+    <string name="duration_add">添加时长</string>
+    <string name="durations_reset">恢复默认时长</string>
+    <string name="duration_remove">移除 %1$d 分钟</string>
     <string name="settings_target_title">每日目标</string>
     <string name="settings_target_hint">计时器下方的进度条会随当天时间的累积而填满。</string>
     <string name="settings_target_toggle">设定每日目标</string>

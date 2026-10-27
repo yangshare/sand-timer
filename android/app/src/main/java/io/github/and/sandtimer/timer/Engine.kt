@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import io.github.and.sandtimer.data.Settings
 import io.github.and.sandtimer.data.Store
 import io.github.and.sandtimer.data.Timer
 import io.github.and.sandtimer.data.TimerState
@@ -18,9 +19,9 @@ import io.github.and.sandtimer.link.SharedTimer
  * alarm wakes the app for the end.
  */
 object Engine {
-    /** The shortest and longest a flip can be made to give, here or by hand in the timer screen. */
-    const val MIN_MINUTES = 1
-    const val MAX_MINUTES = 180
+    /** The shortest and longest a flip can be made to give, here or by hand in Settings. */
+    const val MIN_MINUTES = Settings.MIN_MINUTES
+    const val MAX_MINUTES = Settings.MAX_MINUTES
 
     private fun now() = System.currentTimeMillis()
 

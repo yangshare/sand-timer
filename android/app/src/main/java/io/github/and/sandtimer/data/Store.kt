@@ -32,7 +32,17 @@ data class Settings(
     val calm: Boolean = true,
     /** Come to the front when the linked Mac starts the timer, while the screen is on. */
     val openOnMacStart: Boolean = false,
-)
+    /** The lengths the timer's chips offer, kept and edited in Settings. */
+    val durations: List<Int> = DEFAULT_DURATIONS,
+) {
+    companion object {
+        /** The shortest and longest a length can be, here or by hand in Settings. */
+        const val MIN_MINUTES = 1
+        const val MAX_MINUTES = 180
+        /** The lengths offered at a tap, the Mac's menu among them: a 25-minute Pomodoro, and 6 and 12 for billing time. */
+        val DEFAULT_DURATIONS = listOf(5, 6, 10, 12, 15, 25, 30, 45, 60)
+    }
+}
 
 /** How linking stands, for the Settings screen. */
 data class LinkInfo(
@@ -107,6 +117,9 @@ object Store {
                 focus = prefs.getBoolean("focus", false),
                 calm = prefs.getBoolean("calm", true),
                 openOnMacStart = prefs.getBoolean("openOnMacStart", false),
+                durations = prefs.getString("durations", null)
+                    ?.split(',')?.mapNotNull { it.toIntOrNull() }?.filter { it in Settings.MIN_MINUTES..Settings.MAX_MINUTES }
+                    ?.takeIf { it.isNotEmpty() } ?: Settings.DEFAULT_DURATIONS,
             ),
         )
     }
@@ -161,7 +174,8 @@ object Store {
             .putInt("targetMinutes", s.targetMinutes)
             .putBoolean("oneThingAtATime", s.oneThingAtATime).putBoolean("keepScreenOn", s.keepScreenOn)
             .putBoolean("focus", s.focus).putBoolean("calm", s.calm)
-            .putBoolean("openOnMacStart", s.openOnMacStart).apply()
+            .putBoolean("openOnMacStart", s.openOnMacStart)
+            .putString("durations", s.durations.joinToString(",")).apply()
         _state.value = _state.value.copy(settings = s)
     }
 
