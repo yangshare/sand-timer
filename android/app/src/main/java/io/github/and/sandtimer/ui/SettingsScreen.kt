@@ -20,9 +20,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.RemoveCircleOutline
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -46,6 +48,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.mlkit.vision.barcode.common.Barcode
@@ -55,6 +58,7 @@ import io.github.and.sandtimer.BuildConfig
 import io.github.and.sandtimer.R
 import io.github.and.sandtimer.data.Project
 import io.github.and.sandtimer.data.ProjectList
+import io.github.and.sandtimer.data.Settings
 import io.github.and.sandtimer.data.Store
 import io.github.and.sandtimer.link.BadCodeException
 import io.github.and.sandtimer.link.Link
@@ -72,6 +76,9 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
         Divider()
         Heading(stringResource(R.string.settings_projects_title), stringResource(R.string.settings_projects_hint))
         ProjectsEditor(app.projects)
+        Divider()
+        Heading(stringResource(R.string.settings_durations_title), stringResource(R.string.settings_durations_hint))
+        DurationsEditor(app.settings.durations)
         Divider()
         Heading(stringResource(R.string.settings_target_title), stringResource(R.string.settings_target_hint))
         val target = app.settings.targetMinutes
@@ -316,6 +323,74 @@ private fun ProjectRow(project: Project, projects: ProjectList) {
         }
     }
     Spacer(Modifier.height(6.dp))
+}
+
+/** The lengths the timer's chips offer, added, changed and removed here. */
+@Composable
+private fun DurationsEditor(durations: List<Int>) {
+    var editing by remember { mutableStateOf<Int?>(null) }
+    var adding by remember { mutableStateOf(false) }
+    for (minutes in durations.sorted()) DurationRow(minutes) { editing = minutes }
+    Spacer(Modifier.height(6.dp))
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        OutlinedButton(onClick = { adding = true }) { Text(stringResource(R.string.duration_add)) }
+        TextButton(onClick = { Store.updateSettings { it.copy(durations = Settings.DEFAULT_DURATIONS) } }) {
+            Text(stringResource(R.string.durations_reset))
+        }
+    }
+    if (adding) DurationDialog(null, durations, onDismiss = { adding = false }) { minutes ->
+        Store.updateSettings { it.copy(durations = it.durations + minutes) }
+    }
+    editing?.let { current ->
+        DurationDialog(current, durations, onDismiss = { editing = null }) { minutes ->
+            Store.updateSettings { it.copy(durations = it.durations.map { d -> if (d == current) minutes else d }) }
+        }
+    }
+}
+
+@Composable
+private fun DurationRow(minutes: Int, edit: () -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            stringResource(R.string.duration_value, minutes), color = Color.White,
+            modifier = Modifier.weight(1f).clickable { edit() },
+        )
+        IconButton(onClick = { Store.updateSettings { it.copy(durations = it.durations - minutes) } }) {
+            Icon(Icons.Filled.RemoveCircleOutline, contentDescription = stringResource(R.string.duration_remove, minutes), tint = Color.White.copy(alpha = 0.6f))
+        }
+    }
+}
+
+/**
+ * A length of one's own: any whole number of minutes, from a minute to [Engine.MAX_MINUTES], and not one already
+ * kept. The field starts from the length given, so nudging 60 to 90 means typing a 9 and a 0 over the 6.
+ */
+@Composable
+private fun DurationDialog(initial: Int?, kept: List<Int>, onDismiss: () -> Unit, set: (Int) -> Unit) {
+    var text by remember(initial) { mutableStateOf(initial?.toString().orEmpty()) }
+    val minutes = text.toIntOrNull()
+    val taken = minutes != null && minutes != initial && minutes in kept
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.duration_custom_title)) },
+        text = {
+            OutlinedTextField(
+                value = text, singleLine = true,
+                onValueChange = { text = it.filter(Char::isDigit).take(3) },
+                label = { Text(stringResource(R.string.duration_custom_field)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { set(minutes!!); onDismiss() },
+                enabled = minutes != null && minutes in Engine.MIN_MINUTES..Engine.MAX_MINUTES && !taken,
+            ) {
+                Text(stringResource(R.string.duration_custom_set))
+            }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
+    )
 }
 
 @Composable

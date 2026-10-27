@@ -7,7 +7,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,17 +20,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.VolumeOff
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -57,7 +58,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.ui.draw.alpha
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -77,9 +77,6 @@ import io.github.and.sandtimer.timer.SandSound
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-
-/** The lengths offered at a tap, the Mac's menu among them: a 25-minute Pomodoro, and 6 and 12 for billing time. */
-private val lengths = listOf(5, 6, 10, 12, 15, 25, 30, 45, 60)
 
 @Composable
 fun TimerScreen(modifier: Modifier = Modifier) {
@@ -142,8 +139,6 @@ fun TimerScreen(modifier: Modifier = Modifier) {
     LaunchedEffect(paused) { tilt.animateTo(if (paused) 90f else 0f, tween(450, easing = FastOutSlowInEasing)) }
     val flip = remember { Animatable(0f) }
     var flipping by remember { mutableLongStateOf(0L) }
-    // Asking for a length of one's own, which the chips don't carry.
-    var customizing by remember { mutableStateOf(false) }
 
     fun press() {
         if (!state.inSession(System.currentTimeMillis())) {
@@ -168,6 +163,19 @@ fun TimerScreen(modifier: Modifier = Modifier) {
     Column(modifier.fillMaxSize().padding(horizontal = 16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(Modifier.height(12.dp))
         Column(Modifier.alpha(controls), horizontalAlignment = Alignment.CenterHorizontally) {
+            // The sand's sound, quieted or woken from here, without a trip to Settings.
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                IconButton(
+                    onClick = { Store.updateSettings { it.copy(sandSound = !it.sandSound) } },
+                    modifier = Modifier.size(40.dp),
+                ) {
+                    Icon(
+                        if (app.settings.sandSound) Icons.Filled.VolumeUp else Icons.Filled.VolumeOff,
+                        contentDescription = stringResource(R.string.sand_sound_toggle),
+                        tint = Color.White.copy(alpha = 0.6f),
+                    )
+                }
+            }
             ProjectChips(app.projects, app.activeProject, enabled = canSwitch) { Store.setActiveProject(it) }
             if (!canSwitch) {
                 Text(stringResource(R.string.timer_switch_locked), color = Color.White.copy(alpha = 0.45f), fontSize = 12.sp)
@@ -230,15 +238,15 @@ fun TimerScreen(modifier: Modifier = Modifier) {
                 OutlinedButton(onClick = { Engine.end(context) }) { Text(stringResource(R.string.timer_end_session)) }
             }
         } else {
+            // The lengths kept in Settings, with the length now set among them even if it was taken out.
+            val chips = (app.settings.durations + state.minutes).distinct().sorted()
             Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                // A length set by hand keeps its place among the chips until a preset is picked again.
-                for (m in if (state.minutes in lengths) lengths else lengths + state.minutes) {
+                for (m in chips) {
                     FilterChip(
                         selected = state.minutes == m, onClick = { Engine.setMinutes(context, m) },
                         label = { Text(if (m == 25) stringResource(R.string.chip_pomodoro) else m.toString()) },
                     )
                 }
-                FilterChip(selected = false, onClick = { customizing = true }, label = { Text(stringResource(R.string.chip_custom)) })
             }
         }
 
@@ -246,41 +254,6 @@ fun TimerScreen(modifier: Modifier = Modifier) {
         }
         Spacer(Modifier.height(8.dp))
     }
-
-    if (customizing) {
-        CustomLengthDialog(current = state.minutes, onDismiss = { customizing = false }) { minutes ->
-            customizing = false
-            Engine.setMinutes(context, minutes)
-        }
-    }
-}
-
-/**
- * A length of one's own: any whole number of minutes the chips don't carry, from a minute to [Engine.MAX_MINUTES].
- * The field starts from the length now set, so nudging 60 to 90 means typing a 9 and a 0 over the 6.
- */
-@Composable
-private fun CustomLengthDialog(current: Int, onDismiss: () -> Unit, set: (Int) -> Unit) {
-    var text by remember { mutableStateOf(current.toString()) }
-    val minutes = text.toIntOrNull()
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.duration_custom_title)) },
-        text = {
-            OutlinedTextField(
-                value = text, singleLine = true,
-                onValueChange = { text = it.filter(Char::isDigit).take(3) },
-                label = { Text(stringResource(R.string.duration_custom_field)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = { set(minutes!!) }, enabled = minutes != null && minutes in Engine.MIN_MINUTES..Engine.MAX_MINUTES) {
-                Text(stringResource(R.string.duration_custom_set))
-            }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
-    )
 }
 
 @Composable

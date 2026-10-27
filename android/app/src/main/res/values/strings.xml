@@ -18,7 +18,7 @@
     <string name="timer_resume">Resume</string>
     <string name="timer_end_session">End Session</string>
     <string name="chip_pomodoro">25 🍅</string>
-    <string name="chip_custom">Custom…</string>
+    <string name="sand_sound_toggle">Sand sound on or off</string>
     <string name="duration_custom_title">Custom length</string>
     <string name="duration_custom_field">Minutes</string>
     <string name="duration_custom_set">Set</string>
@@ -49,9 +49,15 @@
     <string name="project_new_name">Project %1$d</string>
     <string name="project_remove">Remove %1$s</string>
 
-    <!-- Settings: projects, daily target, timer -->
+    <!-- Settings: projects, durations, daily target, timer -->
     <string name="settings_projects_title">Projects</string>
     <string name="settings_projects_hint">Time counts toward the project that\'s on.</string>
+    <string name="settings_durations_title">Durations</string>
+    <string name="settings_durations_hint">The lengths the timer\'s chips offer — add, change or remove them.</string>
+    <string name="duration_value">%1$d min</string>
+    <string name="duration_add">Add a duration</string>
+    <string name="durations_reset">Restore the defaults</string>
+    <string name="duration_remove">Remove %1$d min</string>
     <string name="settings_target_title">Daily target</string>
     <string name="settings_target_hint">A bar under the timer fills as the day\'s time runs.</string>
     <string name="settings_target_toggle">Aim for a daily target</string>
