@@ -10,6 +10,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,7 +21,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -47,6 +51,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -56,8 +63,10 @@ import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import io.github.and.sandtimer.BuildConfig
 import io.github.and.sandtimer.R
+import io.github.and.sandtimer.data.Base
 import io.github.and.sandtimer.data.Project
 import io.github.and.sandtimer.data.ProjectList
+import io.github.and.sandtimer.data.SandColor
 import io.github.and.sandtimer.data.Settings
 import io.github.and.sandtimer.data.Store
 import io.github.and.sandtimer.link.BadCodeException
@@ -79,6 +88,9 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
         Divider()
         Heading(stringResource(R.string.settings_durations_title), stringResource(R.string.settings_durations_hint))
         DurationsEditor(app.settings.durations)
+        Divider()
+        Heading(stringResource(R.string.settings_look_title), stringResource(R.string.settings_look_hint))
+        LookEditor(app.settings.color, app.settings.base)
         Divider()
         Heading(stringResource(R.string.settings_target_title), stringResource(R.string.settings_target_hint))
         val target = app.settings.targetMinutes
@@ -298,7 +310,7 @@ private fun ProjectRow(project: Project, projects: ProjectList) {
         Store.updateProjects(projects.copy(all = projects.all.map { if (it.id == project.id) edit(it) else it }))
 
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Box(Modifier.size(28.dp).clip(CircleShape).background(sandColor(project.color)).clickable { choosing = !choosing })
+        Box(Modifier.size(28.dp).clip(CircleShape).background(sandColor(project.color)).border(1.dp, Rim, CircleShape).clickable { choosing = !choosing })
         Spacer(Modifier.width(10.dp))
         OutlinedTextField(
             value = name, singleLine = true, modifier = Modifier.weight(1f),
@@ -315,7 +327,7 @@ private fun ProjectRow(project: Project, projects: ProjectList) {
         Row(Modifier.padding(start = 38.dp, top = 6.dp, bottom = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             for (hex in ProjectList.palette) {
                 Box(
-                    Modifier.size(24.dp).clip(CircleShape).background(sandColor(hex))
+                    Modifier.size(24.dp).clip(CircleShape).background(sandColor(hex)).border(1.dp, Rim, CircleShape)
                         .border(2.dp, if (hex.equals(project.color, true)) Color.White else Color.Transparent, CircleShape)
                         .clickable { change { it.copy(color = hex) }; choosing = false },
                 )
@@ -323,6 +335,63 @@ private fun ProjectRow(project: Project, projects: ProjectList) {
         }
     }
     Spacer(Modifier.height(6.dp))
+}
+
+/** The names of the sand colours, in [SandColor.all]'s order. */
+private val sandColorNames =
+    listOf(R.string.color_purple, R.string.color_teal, R.string.color_pink, R.string.color_blue, R.string.color_white, R.string.color_black, R.string.color_sand)
+
+/**
+ * The glass's colour and base, the Mac's Appearance menu: seven colours and two bases, each base shown as it stands
+ * the moment it's chosen. What is chosen here shows whenever no project is on.
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun LookEditor(color: Int, base: Base) {
+    Text(stringResource(R.string.settings_look_color), color = Color.White)
+    Spacer(Modifier.height(6.dp))
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        for ((index, entry) in SandColor.all.withIndex()) {
+            val chosen = index == color
+            val name = stringResource(sandColorNames[index])
+            Box(
+                Modifier.size(40.dp).clip(CircleShape)
+                    .selectable(selected = chosen, role = Role.RadioButton, onClick = { Store.updateSettings { it.copy(color = index) } })
+                    .semantics { contentDescription = name }
+                    .border(2.dp, if (chosen) Color.White else Color.Transparent, CircleShape)
+                    .padding(6.dp),
+            ) {
+                Box(Modifier.fillMaxSize().clip(CircleShape).background(sandColor(entry.sand)).border(1.dp, Rim, CircleShape))
+            }
+        }
+    }
+    Spacer(Modifier.height(14.dp))
+    Text(stringResource(R.string.settings_look_base), color = Color.White)
+    Spacer(Modifier.height(6.dp))
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        for (choice in Base.entries) {
+            val chosen = base == choice
+            Column(
+                Modifier.width(104.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(if (chosen) Panel else Color.Transparent)
+                    .selectable(selected = chosen, role = Role.RadioButton, onClick = { Store.updateSettings { it.copy(base = choice) } })
+                    .border(2.dp, if (chosen) Color.White else Color.White.copy(alpha = 0.14f), RoundedCornerShape(14.dp))
+                    .padding(top = 6.dp, bottom = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                // The glass as it stands on these caps, in the colour chosen above.
+                Hourglass(
+                    fallen = 0.35f, angle = 0f, running = false, theme = Theme(color, choice), minutes = 25,
+                    display = Display("", null, null), time = 0.0, modifier = Modifier.fillMaxWidth().height(124.dp),
+                )
+                Text(
+                    stringResource(if (choice == Base.BLACK) R.string.base_black else R.string.base_matching),
+                    color = Color.White.copy(alpha = if (chosen) 1f else 0.6f), fontSize = 13.sp,
+                )
+            }
+        }
+    }
 }
 
 /** The lengths the timer's chips offer, added, changed and removed here. */

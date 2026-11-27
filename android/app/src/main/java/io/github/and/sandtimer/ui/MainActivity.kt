@@ -54,6 +54,8 @@ import io.github.and.sandtimer.timer.Engine
 val Ink = Color(0xFF12161C)
 val Panel = Color(0xFF1C222B)
 val Amber = Color(0xFFD9A441)
+/** A faint rim round a patch of sand, so that the black sand still shows against the night desk. */
+val Rim = Color.White.copy(alpha = 0.25f)
 
 class MainActivity : ComponentActivity() {
     private val askNotifications = registerForActivityResult(ActivityResultContracts.RequestPermission()) {}

@@ -2,6 +2,7 @@ package io.github.and.sandtimer.ui
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,6 +38,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -137,7 +139,7 @@ private fun Breakdown(projects: Map<String, io.github.and.sandtimer.data.Tally>,
     Spacer(Modifier.height(6.dp))
     for ((id, tally) in parts) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(8.dp).clip(CircleShape).background(projectColor(id, list)))
+            Box(Modifier.size(8.dp).clip(CircleShape).background(projectColor(id, list)).border(1.dp, Rim, CircleShape))
             Text(
                 stringResource(R.string.stats_legend_item, list.displayName(id), durationLabel(res, tally.seconds)),
                 color = Color.White.copy(alpha = 0.75f), fontSize = 13.sp,
@@ -148,6 +150,9 @@ private fun Breakdown(projects: Map<String, io.github.and.sandtimer.data.Tally>,
 
 private fun projectColor(id: String, list: ProjectList): Color =
     if (id.isEmpty()) Color(0xFF8A8F98) else sandColor(list.project(id)?.color ?: "#8A8F98")
+
+/** A colour close to the night desk, which would vanish against it: the black sand, say. */
+private fun Color.sinksIntoInk() = maxOf(red, green, blue) < 0.3f
 
 @Composable
 private fun Chart(buckets: List<SandLog.Bucket>, list: ProjectList, selected: Int, select: (Int) -> Unit) {
@@ -178,10 +183,18 @@ private fun Chart(buckets: List<SandLog.Bucket>, list: ProjectList, selected: In
                 val h = (seconds / most * chartHeight).toFloat()
                 if (h < 0.5f) continue
                 top -= h
+                val color = projectColor(id, list)
                 drawRoundRect(
-                    projectColor(id, list).copy(alpha = dim), topLeft = Offset(x, top), size = Size(barWidth, h),
+                    color.copy(alpha = dim), topLeft = Offset(x, top), size = Size(barWidth, h),
                     cornerRadius = CornerRadius(2.dp.toPx()),
                 )
+                // One close to the night desk would vanish against it, so it is edged instead.
+                if (color.sinksIntoInk()) {
+                    drawRoundRect(
+                        Color.White.copy(alpha = 0.35f * dim), topLeft = Offset(x, top), size = Size(barWidth, h),
+                        cornerRadius = CornerRadius(2.dp.toPx()), style = Stroke(1.dp.toPx()),
+                    )
+                }
             }
             if (index == selected) {
                 drawRoundRect(
@@ -210,7 +223,7 @@ private fun Legend(ids: Set<String>, list: ProjectList) {
     FlowRow(horizontalArrangement = Arrangement.spacedBy(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         for (id in list.ordered(ids)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.size(8.dp).clip(CircleShape).background(projectColor(id, list)))
+                Box(Modifier.size(8.dp).clip(CircleShape).background(projectColor(id, list)).border(1.dp, Rim, CircleShape))
                 Text(" " + list.displayName(id), color = Color.White.copy(alpha = 0.6f), fontSize = 12.sp)
             }
         }

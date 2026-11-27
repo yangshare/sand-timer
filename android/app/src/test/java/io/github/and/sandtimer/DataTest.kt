@@ -1,7 +1,9 @@
 package io.github.and.sandtimer
 
+import io.github.and.sandtimer.data.Base
 import io.github.and.sandtimer.data.Project
 import io.github.and.sandtimer.data.ProjectList
+import io.github.and.sandtimer.data.SandColor
 import io.github.and.sandtimer.data.SandLog
 import io.github.and.sandtimer.data.Timer
 import io.github.and.sandtimer.data.TimerState
@@ -78,6 +80,22 @@ class DataTest {
         val p = Project.fromJson(Json.parseToJsonElement(json).jsonObject)!!
         assertEquals(1791369600.5, p.updated, 0.0)
         assertEquals(p, Project.fromJson(p.toJson()))
+    }
+
+    @Test fun `the palette is the Mac's own, in its order`() {
+        // As Sources/Settings.swift puts it together: the Mac's seven sand colours, then four more.
+        assertEquals(
+            listOf("#6C2ED6", "#34BEA6", "#EC62A0", "#2876E2", "#ECE9E2", "#222124", "#D6B688", "#E8833A", "#3FA34D", "#D4B106", "#8E5A3C"),
+            ProjectList.palette,
+        )
+        assertEquals(ProjectList.palette.take(SandColor.all.size), SandColor.all.map { it.sand })
+    }
+
+    @Test fun `the base kept by name reads back, and anything else is black`() {
+        assertEquals(Base.MATCHING, Base.named("MATCHING"))
+        assertEquals(Base.BLACK, Base.named("BLACK"))
+        assertEquals(Base.BLACK, Base.named(null))
+        assertEquals(Base.BLACK, Base.named("MAHOGANY"))
     }
 
     @Test fun `what is sealed opens with the key, in the Mac's layout`() {

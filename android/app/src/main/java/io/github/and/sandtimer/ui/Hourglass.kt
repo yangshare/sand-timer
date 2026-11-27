@@ -25,6 +25,8 @@ import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
+import io.github.and.sandtimer.data.Base
+import io.github.and.sandtimer.data.SandColor
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
@@ -254,6 +256,31 @@ private object Physics {
 /** What the caps show: the time on the base's ring, the project on the top's, and the day's target on the plate. */
 data class Display(val time: String, val project: String?, val goal: Double?)
 
+/**
+ * A sand colour on a base (the caps), the Mac's `Theme`: black like the purple product photo, or matching like the
+ * teal one. Black caps get light print; coloured caps get dark print.
+ */
+class Theme(val sand: Color, val cap: Color) {
+    val darkCap = maxOf(cap.red, cap.green, cap.blue) < 0.5f
+
+    /** Colour of the time shown on the base: light on dark caps, a deep shade of the cap on light ones. */
+    val displayInk = if (darkCap) Color(0.84f, 0.84f, 0.84f) else mix(cap, Color.Black, 0.72f)
+
+    companion object {
+        private val blackCap = Color(22 / 255f, 22 / 255f, 24 / 255f)
+
+        /** One of the colours Settings offers, by its place among them — the first for a place there isn't. */
+        operator fun invoke(color: Int, base: Base): Theme {
+            val entry = SandColor.all.getOrElse(color) { SandColor.all.first() }
+            return Theme(sandColor(entry.sand), if (base == Base.BLACK) blackCap else sandColor(entry.matchingCap))
+        }
+
+        /** Sand of any colour — a project's — on either base. A matching cap is the sand lightened, as the palette's own caps are. */
+        operator fun invoke(sand: Color, base: Base): Theme =
+            Theme(sand, if (base == Base.BLACK) blackCap else mix(sand, Color.White, 0.35f))
+    }
+}
+
 /** Grains seen through the round glass, crowding toward the walls: the Mac's cylindrical-lens speckles. */
 private class Speckles {
     /** Grains of several tones, the way real sand is never one colour: deep, dark, light, and the odd glint. */
@@ -290,13 +317,15 @@ private fun mix(a: Color, b: Color, t: Float) = Color(
 /**
  * The timer, [fallen] of its sand run through (0 just flipped, 1 all below), turned [angle] degrees (90 lies it on
  * its side as a pause does; 180 is a flip). While [running] and upright the stream pours, [time] (seconds) moving
- * its grains. [minutes] sets the neck, wide for short timers and narrow for long ones, as on the Mac.
+ * its grains. [minutes] sets the neck, wide for short timers and narrow for long ones, as on the Mac. The sand and
+ * the caps are drawn in [theme].
  */
 @Composable
 fun Hourglass(
-    fallen: Float, angle: Float, running: Boolean, sand: Color, minutes: Int, display: Display, time: Double,
+    fallen: Float, angle: Float, running: Boolean, theme: Theme, minutes: Int, display: Display, time: Double,
     modifier: Modifier = Modifier,
 ) {
+    val sand = theme.sand
     val speckles = remember { Speckles() }
     val neckScale = Physics.neckScale(minutes)
     val glass = remember(neckScale) { Pair(glassPath(false, neckScale), glassPath(true, neckScale)) }
@@ -334,13 +363,13 @@ fun Hourglass(
                 }
             }
             drawGlassFront(glass.first, glass.second)
-            drawCap(top = true)
-            drawCap(top = false)
+            drawCap(top = true, theme)
+            drawCap(top = false, theme)
             drawCaustic(sand)
-            printOnRing(display.time, Rect(19f, 354f, 181f, 382f), Rect(19f, 354f, 181f, 377f), 365.5f, 1f)
+            printOnRing(display.time, Rect(19f, 354f, 181f, 382f), Rect(19f, 354f, 181f, 377f), 365.5f, 1f, theme)
             // The project is a mark moulded into the top ring rather than a second display, so the eye goes to the time.
-            display.project?.let { printOnRing(it, Rect(19f, 18f, 181f, 46f), Rect(19f, 23f, 181f, 46f), 34.5f, 0.42f) }
-            display.goal?.let { drawGoal(it, sand) }
+            display.project?.let { printOnRing(it, Rect(19f, 18f, 181f, 46f), Rect(19f, 23f, 181f, 46f), 34.5f, 0.42f, theme) }
+            display.goal?.let { drawGoal(it, sand, theme) }
         }
     }
 }
@@ -576,22 +605,22 @@ private fun DrawScope.drawRestingSand(
     }
 }
 
-// The caps and their print: black plastic, as the Mac's black base.
+// The caps and their print: black plastic, as the Mac's black base — or the colour of the sand, as its matching one.
 
-private val Cap = Color(22 / 255f, 22 / 255f, 24 / 255f)
-private val CapDark = mix(Cap, Color.Black, 0.35f)
-private val CapLit = mix(Cap, Color.White, 0.22f)
 private val glint = listOf(Color.White.copy(alpha = 0f), Color.White, Color.White.copy(alpha = 0f))
 
-private fun DrawScope.drawCap(top: Boolean) {
+private fun DrawScope.drawCap(top: Boolean, theme: Theme) {
+    val base = theme.cap
+    val dark = mix(base, Color.Black, 0.35f)
+    val lit = mix(base, Color.White, 0.22f)
     val band = Rect(19f, if (top) 18f else 354f, 181f, if (top) 46f else 382f)
     val disc = Rect(7f, if (top) 0f else 377f, 193f, if (top) 23f else 400f)
 
-    drawRoundRect(Brush.horizontalGradient(0f to CapDark, 0.22f to CapLit, 0.6f to Cap, 1f to CapDark, startX = band.left, endX = band.right),
+    drawRoundRect(Brush.horizontalGradient(0f to dark, 0.22f to lit, 0.6f to base, 1f to dark, startX = band.left, endX = band.right),
         band.topLeft, band.size, CornerRadius(3f))
     drawRect(Color.White.copy(alpha = 0.12f), Offset(band.left + 2, if (top) band.bottom - 1.5f else band.top + 0.5f), Size(band.width - 4, 1f))
 
-    drawRoundRect(Brush.horizontalGradient(0f to CapDark, 0.2f to CapLit, 0.55f to Cap, 1f to CapDark, startX = disc.left, endX = disc.right),
+    drawRoundRect(Brush.horizontalGradient(0f to dark, 0.2f to lit, 0.55f to base, 1f to dark, startX = disc.left, endX = disc.right),
         disc.topLeft, disc.size, CornerRadius(6f))
     val sheen = Rect(disc.left + 3, disc.top + 1, disc.right - 3, disc.bottom - 1)
     drawRoundRect(Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.16f), Color.White.copy(alpha = 0f)), startY = sheen.top, endY = sheen.bottom),
@@ -617,7 +646,8 @@ private val printPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
  * Words printed on one of the rings as the Mac prints the time: wrapped round the cylinder (each letter pushed in
  * and narrowed by how far round it sits), pressed into the plastic, and shaded like the ring.
  */
-private fun DrawScope.printOnRing(text: String, ring: Rect, clip: Rect, centerY: Float, alpha: Float) {
+private fun DrawScope.printOnRing(text: String, ring: Rect, clip: Rect, centerY: Float, alpha: Float, theme: Theme) {
+    if (text.isEmpty()) return
     val radius = ring.width / 2
     val room = ring.width - 24
     var size = 16f
@@ -630,7 +660,10 @@ private fun DrawScope.printOnRing(text: String, ring: Rect, clip: Rect, centerY:
     while (printPaint.measureText(shown) > room && shown.length > 2) shown = shown.dropLast(2) + "…"
     val width = printPaint.measureText(shown)
     val baseline = centerY - printPaint.fontMetrics.ascent * 0.35f
-    val ink = Color(0.84f, 0.84f, 0.84f)
+    val ink = theme.displayInk
+    // Printed in: on dark plastic the lip is faint and the shadow deep, on light plastic the other way round.
+    val lip = if (theme.darkCap) 0.16f else 0.4f
+    val shade = if (theme.darkCap) 0.5f else 0.25f
 
     clipRect(clip.left, clip.top, clip.right, clip.bottom) {
         val canvas = drawContext.canvas.nativeCanvas
@@ -652,8 +685,8 @@ private fun DrawScope.printOnRing(text: String, ring: Rect, clip: Rect, centerY:
             printPaint.shader = null
         }
         // Pressed into the plastic: light catches the lower lip, the upper edge falls into shadow.
-        pass(0.6f, null, Color.White.copy(alpha = 0.16f * alpha).toArgb())
-        pass(-0.5f, null, Color.Black.copy(alpha = 0.5f * alpha).toArgb())
+        pass(0.6f, null, Color.White.copy(alpha = lip * alpha).toArgb())
+        pass(-0.5f, null, Color.Black.copy(alpha = shade * alpha).toArgb())
         // The ink, shaded like the ring: darker toward its ends, brightest where it catches the light.
         val stops = intArrayOf(
             mix(ink, Color.Black, 0.5f).toArgb(), mix(ink, Color.White, 0.2f).toArgb(), ink.toArgb(), mix(ink, Color.Black, 0.55f).toArgb(),
@@ -664,13 +697,16 @@ private fun DrawScope.printOnRing(text: String, ring: Rect, clip: Rect, centerY:
 }
 
 /** The day's progress against its target: a groove let into the front of the base plate, filling with sand. */
-private fun DrawScope.drawGoal(goal: Double, sand: Color) {
+private fun DrawScope.drawGoal(goal: Double, sand: Color, theme: Theme) {
     val left = 17f
     val right = 183f
     val y = 391.6f
     val width = 4.4f
-    drawLine(Color.White.copy(alpha = 0.16f), Offset(left, y + 0.9f), Offset(right, y + 0.9f), width, StrokeCap.Round)
-    drawLine(Color.Black.copy(alpha = 0.6f), Offset(left, y), Offset(right, y), width, StrokeCap.Round)
+    // Pressed into the plastic as the time is: a faint lip and a deep shadow on dark plastic, the other way round on light.
+    val lip = if (theme.darkCap) 0.16f else 0.4f
+    val shade = if (theme.darkCap) 0.6f else 0.42f
+    drawLine(Color.White.copy(alpha = lip), Offset(left, y + 0.9f), Offset(right, y + 0.9f), width, StrokeCap.Round)
+    drawLine(Color.Black.copy(alpha = shade), Offset(left, y), Offset(right, y), width, StrokeCap.Round)
     drawLine(Color.Black.copy(alpha = 0.35f), Offset(left, y - 1.3f), Offset(right, y - 1.3f), 0.9f, StrokeCap.Round)
     val done = goal.coerceIn(0.0, 1.0).toFloat()
     // Once the target is met the sand warms a little.
@@ -685,7 +721,12 @@ private fun DrawScope.drawGoal(goal: Double, sand: Color) {
     }
 }
 
-/** "#RRGGBB" as a colour, or the Mac's purple sand. */
-fun sandColor(hex: String?): Color = runCatching {
-    Color(android.graphics.Color.parseColor(hex ?: "#6C2ED6"))
-}.getOrDefault(Color(0xFF6C2ED6))
+/**
+ * A colour written "#RRGGBB", read as the Mac's `NSColor(hex:)` reads it — six hex digits, with or without the "#" —
+ * or the Mac's purple sand for anything else.
+ */
+fun sandColor(hex: String?): Color {
+    val digits = hex.orEmpty().removePrefix("#")
+    val isHex = { c: Char -> c in '0'..'9' || c in 'a'..'f' || c in 'A'..'F' }
+    return if (digits.length == 6 && digits.all(isHex)) Color(0xFF000000L or digits.toLong(16)) else Color(0xFF6C2ED6)
+}

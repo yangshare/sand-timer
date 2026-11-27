@@ -34,6 +34,10 @@ data class Settings(
     val openOnMacStart: Boolean = false,
     /** The lengths the timer's chips offer, kept and edited in Settings. */
     val durations: List<Int> = DEFAULT_DURATIONS,
+    /** The sand's colour when no project is on: which of [SandColor.all], as the Mac's Appearance colour. */
+    val color: Int = 0,
+    /** The caps: black, or matching the sand. */
+    val base: Base = Base.BLACK,
 ) {
     companion object {
         /** The shortest and longest a length can be, here or by hand in Settings. */
@@ -120,6 +124,8 @@ object Store {
                 durations = prefs.getString("durations", null)
                     ?.split(',')?.mapNotNull { it.toIntOrNull() }?.filter { it in Settings.MIN_MINUTES..Settings.MAX_MINUTES }
                     ?.takeIf { it.isNotEmpty() } ?: Settings.DEFAULT_DURATIONS,
+                color = prefs.getInt("color", 0),
+                base = Base.named(prefs.getString("base", null)),
             ),
         )
     }
@@ -175,7 +181,8 @@ object Store {
             .putBoolean("oneThingAtATime", s.oneThingAtATime).putBoolean("keepScreenOn", s.keepScreenOn)
             .putBoolean("focus", s.focus).putBoolean("calm", s.calm)
             .putBoolean("openOnMacStart", s.openOnMacStart)
-            .putString("durations", s.durations.joinToString(",")).apply()
+            .putString("durations", s.durations.joinToString(","))
+            .putInt("color", s.color).putString("base", s.base.name).apply()
         _state.value = _state.value.copy(settings = s)
     }
 

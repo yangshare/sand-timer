@@ -62,6 +62,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.runtime.withFrameMillis
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -157,7 +158,11 @@ fun TimerScreen(modifier: Modifier = Modifier) {
 
     val project = app.projects.project(app.activeProject)
     val sessionProject = app.projects.project(state.project)
-    val sand = sandColor((if (state.inSession(now)) sessionProject else project)?.color)
+    // The sand's colour and the caps': the project's colour while one is on, the colour chosen in Settings otherwise,
+    // on the base chosen there — as on the Mac.
+    val base = app.settings.base
+    val theme = (if (state.inSession(now)) sessionProject else project)?.color?.let { Theme(sandColor(it), base) }
+        ?: Theme(app.settings.color, base)
     val canSwitch = !app.settings.oneThingAtATime || !state.inSession(now)
 
     Column(modifier.fillMaxSize().padding(horizontal = 16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -197,7 +202,7 @@ fun TimerScreen(modifier: Modifier = Modifier) {
                 fallen = if (flipping != 0L) 1f else state.fallen(now).toFloat(),
                 angle = if (flipping != 0L) flip.value else tilt.value,
                 running = running && flipping == 0L,
-                sand = sand,
+                theme = theme,
                 minutes = state.minutes,
                 // The time printed on the base, the project on the top cap, and the day's target along the plate, as on the Mac.
                 display = Display(Notifications.clock(left), ((if (state.inSession(now)) sessionProject else project)?.name), goal),
@@ -265,7 +270,8 @@ private fun ProjectChips(projects: ProjectList, active: String?, enabled: Boolea
             FilterChip(
                 selected = active == id, enabled = enabled || active == id, onClick = { choose(id) },
                 leadingIcon = {
-                    Box(Modifier.size(10.dp).clip(CircleShape).background(if (p == null) Color.Gray else sandColor(p.color)))
+                    // A faint rim, so that a project in the black sand still shows against the night desk.
+                    Box(Modifier.size(10.dp).clip(CircleShape).background(if (p == null) Color.Gray else sandColor(p.color)).border(1.dp, Color.White.copy(alpha = 0.25f), CircleShape))
                 },
                 label = { Text(projects.displayName(id)) },
                 colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Panel),

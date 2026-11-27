@@ -83,6 +83,21 @@
     <string name="settings_focus_summary">Turns on a Do Not Disturb mode called Sand Timer while the sand runs, and off when it stops. Change what it lets through in the phone\'s Modes settings.</string>
     <string name="settings_about">Sand Timer %1$s. Your time stays on this phone unless you link it to your Mac.</string>
 
+    <!-- Settings: appearance -->
+    <string name="settings_look_title">Appearance</string>
+    <string name="settings_look_hint">How the glass looks when no project is on. With a project on, the sand takes the project\'s color.</string>
+    <string name="settings_look_color">Sand color</string>
+    <string name="settings_look_base">Base</string>
+    <string name="base_black">Black</string>
+    <string name="base_matching">Matching</string>
+    <string name="color_purple">Purple</string>
+    <string name="color_teal">Teal</string>
+    <string name="color_pink">Pink</string>
+    <string name="color_blue">Blue</string>
+    <string name="color_white">White</string>
+    <string name="color_black">Black</string>
+    <string name="color_sand">Sand</string>
+
     <!-- Settings: link to a Mac -->
     <string name="settings_link_title">Link to a Mac</string>
     <string name="settings_link_intro">Optional: share one timer, your projects and statistics with Sand Timer on your Mac. The two talk over Bluetooth, encrypted, whenever they\'re near each other.</string>
