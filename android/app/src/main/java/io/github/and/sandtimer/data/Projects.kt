@@ -118,9 +118,10 @@ data class ProjectList(val all: List<Project> = emptyList()) {
         fun fromJson(array: JsonArray?): ProjectList =
             ProjectList(array.orEmpty().mapNotNull { runCatching { Project.fromJson(it.jsonObject) }.getOrNull() }).deduplicated()
 
-        /** Colours for new projects, the Mac's sand colours first. */
-        val palette = listOf(
-            "#6C2ED6", "#2876E2", "#34BEA6", "#E0559A", "#D6B688", "#E8833A", "#3FA34D", "#D4B106", "#8E5A3C", "#C2410C", "#475569",
-        )
+        /**
+         * Colours for new projects and for the picker, the Mac's own in its order (Sources/Settings.swift): its seven
+         * sand colours, then four more.
+         */
+        val palette = SandColor.all.map { it.sand } + listOf("#E8833A", "#3FA34D", "#D4B106", "#8E5A3C")
     }
 }

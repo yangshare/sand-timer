@@ -80,6 +80,21 @@
     <string name="settings_focus_summary">沙漏运行时自动开启名为“沙漏计时器”的勿扰模式，停止时关闭。可在系统的“模式”设置中更改其放行内容。</string>
     <string name="settings_about">沙漏计时器 %1$s。除非连接到你的 Mac，你的时间记录只保存在这台手机上。</string>
 
+    <!-- 设置：外观 -->
+    <string name="settings_look_title">外观</string>
+    <string name="settings_look_hint">未选择项目时沙漏的样子。选择项目后，沙子会呈现项目的颜色。</string>
+    <string name="settings_look_color">沙子颜色</string>
+    <string name="settings_look_base">底座</string>
+    <string name="base_black">黑色</string>
+    <string name="base_matching">同色</string>
+    <string name="color_purple">紫色</string>
+    <string name="color_teal">青色</string>
+    <string name="color_pink">粉色</string>
+    <string name="color_blue">蓝色</string>
+    <string name="color_white">白色</string>
+    <string name="color_black">黑色</string>
+    <string name="color_sand">沙色</string>
+
     <!-- 设置：连接到 Mac -->
     <string name="settings_link_title">连接到 Mac</string>
     <string name="settings_link_intro">可选：与 Mac 上的沙漏计时器共享同一个计时器、项目和统计。两者靠近时通过蓝牙加密通信。</string>
